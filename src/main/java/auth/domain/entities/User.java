@@ -1,11 +1,7 @@
 package auth.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Filter;
 
@@ -14,11 +10,12 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
 @Filter(name = "deletedAtFilter", condition = "deleted_at is null")
-public class user {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id_gen")
     @SequenceGenerator(name="users_id_gen",sequenceName = "users_id_seq",allocationSize = 1)
