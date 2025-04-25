@@ -1,6 +1,7 @@
-package auth.presentation.dtos;
+package com.purwafest.purwafest.auth.presentation.dtos;
 
-import auth.domain.entities.User;
+import com.purwafest.purwafest.auth.domain.entities.User;
+import com.purwafest.purwafest.auth.domain.enums.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ public class RegisterRequest {
     private String email;
     private String password;
     private String msisdn;
+    private UserType userType;
 
     public User toUser() {
         return User.builder()
@@ -20,6 +22,7 @@ public class RegisterRequest {
                 .email(email)
                 .password(password)
                 .msisdn(msisdn)
+                .userType(userType)
                 .build();
     }
 }

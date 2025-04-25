@@ -1,9 +1,12 @@
-package auth.domain.entities;
+package com.purwafest.purwafest.auth.domain.entities;
 
+import com.purwafest.purwafest.auth.domain.enums.UserType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.Instant;
 
@@ -33,6 +36,11 @@ public class User {
 
     @Column(name="msisdn",nullable = true,length = 20)
     private String msisdn;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_type")
+    @JdbcType(value = PostgreSQLEnumJdbcType.class)
+    private UserType userType;
 
     @ColumnDefault("now()")
     @Column(name = "created_at")

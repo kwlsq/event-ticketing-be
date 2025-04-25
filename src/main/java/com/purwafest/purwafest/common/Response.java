@@ -1,4 +1,4 @@
-package common;
+package com.purwafest.purwafest.common;
 
 import lombok.Data;
 import lombok.ToString;
