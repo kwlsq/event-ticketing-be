@@ -1,13 +1,13 @@
 package com.purwafest.purwafest.event.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.purwafest.purwafest.event.domain.enums.EventStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.Filter;
 
+import java.math.BigInteger;
 import java.time.Instant;
 import java.util.Set;
 
@@ -17,48 +17,35 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "event")
+@Table(name = "event_ticket_type")
 @Filter(name = "deletedAtFilter", condition = "deleted_at is null")
-public class Event {
+public class EventTicketType {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "event_id_gen")
-  @SequenceGenerator(name = "event_id_gen", sequenceName = "event_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "event_ticket_type_id_gen")
+  @SequenceGenerator(name = "event_ticket_type_id_gen", sequenceName = "event_ticket_type_id_seq", allocationSize = 1)
   @Column(name = "id", nullable = false)
   private Integer id;
 
   @NotNull
-  @Size(max = 255)
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "description")
-  private String description;
-
-  @Column(name = "image_url")
-  private String imageUrl;
-
-  @Column(name = "date")
-  private Instant date;
-
-  @Column(name = "venue")
-  private String venue;
+  @NotNull
+  @Column(name = "price", nullable = false)
+  private BigInteger price;
 
   @NotNull
-  @Column(name = "location", nullable = false)
-  private String location;
+  @Column(name = "stock", nullable = false)
+  private Integer stock;
 
-  @NotNull
-  @Column(name = "is_free", nullable = false)
-  private boolean isEventFree;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "event_id", referencedColumnName = "id")
+  @JsonBackReference
+  private Event event;
 
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  @Column(name = "status", nullable = false)
-  private EventStatus status;
-
-  @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "eventTicketType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
-  private Set<EventTicketType> ticketTypes;
+  private Set<Ticket> tickets;
 
   @Column(name = "created_at")
   private Instant createdAt;
