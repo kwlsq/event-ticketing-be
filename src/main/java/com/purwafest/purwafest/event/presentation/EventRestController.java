@@ -1,8 +1,12 @@
 package com.purwafest.purwafest.event.presentation;
 
+import com.purwafest.purwafest.common.Response;
 import com.purwafest.purwafest.event.application.EventServices;
 import com.purwafest.purwafest.event.domain.entities.Event;
 import com.purwafest.purwafest.event.presentation.dtos.EventRequest;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,8 +21,11 @@ public class EventRestController {
   }
 
   @PostMapping("/create")
-  public Event createEvent(@RequestBody EventRequest request) {
-    return eventServices.createEvent(request);
+  public ResponseEntity<?> createEvent(@RequestBody @Valid EventRequest request) {
+    return Response.successfulResponse(
+        "Success to create event!",
+        eventServices.createEvent(request)
+    );
   }
 
   @GetMapping
