@@ -30,4 +30,12 @@ public class UserRestController {
                 userService.register(request.toUser(), registrationType)
         );
     }
+
+    @PostMapping("/login/{loginType}")
+    public ResponseEntity<?> login(@RequestBody RegisterRequest request, @PathVariable String loginType) {
+        return Response.successfulResponse(
+                "Login Success",
+                userService.login(request.toUser(), loginType)
+        );
+    }
 }
