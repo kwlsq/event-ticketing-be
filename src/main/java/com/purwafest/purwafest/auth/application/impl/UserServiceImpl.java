@@ -77,4 +77,16 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public User profile(Integer id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            User foundUser = user.get();
+            foundUser.setPassword(null); // Don't send password to the client
+            return foundUser;
+        } else {
+            throw new UserNotFoundException("User not found");
+        }
+    }
+
 }

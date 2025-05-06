@@ -9,4 +9,5 @@ public interface UserService extends UserDetailsService {
     User register(User request, String registrationType);
     List<User> getAll();
     User getUserByEmail(String email);
+    User profile(Integer id);
 }
