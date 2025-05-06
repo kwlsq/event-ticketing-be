@@ -4,19 +4,28 @@ import com.purwafest.purwafest.auth.application.UserService;
 import com.purwafest.purwafest.auth.domain.entities.User;
 import com.purwafest.purwafest.auth.domain.enums.UserType;
 import com.purwafest.purwafest.auth.domain.exceptions.DuplicateUserException;
+import com.purwafest.purwafest.auth.domain.exceptions.LoginFailedException;
+import com.purwafest.purwafest.auth.domain.exceptions.UserNotFoundException;
+import com.purwafest.purwafest.auth.domain.valueObject.AuthUserDetail;
 import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
     //Dependency injection from repositories
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository){
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -27,17 +36,56 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User register(User request, String registrationType){
-        // Convert registrationType to uppercase and map it to the UserType enum
-        UserType userType = UserType.valueOf(registrationType.toUpperCase());
+        UserType userType = mapToUserType(registrationType);
 
-        //Check if user with submitted email exists
-        long userWithSameEmailCount = userRepository.countByEmailAndUserType(request.getEmail(),userType);
+        long userWithSameEmailCount = userRepository.countByEmail(request.getEmail());
         if (userWithSameEmailCount != 0) {
-            throw new DuplicateUserException(registrationType + " with this email already exists");
+            throw new DuplicateUserException("Account with this email already exists");
         }
-        //Set type base on registrationType, save to DB, then return the result of newly registered user
-        request.setUserType(registrationType.equalsIgnoreCase("user")? UserType.USER:UserType.ORGANIZER);
+
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        request.setUserType(userType);
         return userRepository.save(request);
+    }
+
+    @Override
+    public User login(User request){
+
+        Optional<User> foundUser = userRepository.findUserByEmail(request.getEmail());
+        if (foundUser.isEmpty() || !request.getPassword().equals(foundUser.get().getPassword())) {
+            throw new LoginFailedException("Invalid email or password");
+        }
+
+        return foundUser.get();
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        Optional<User> user = userRepository.findUserByEmail(email);
+        if (user.isPresent()) {
+            return user.get();
+        } else {
+            throw new UserNotFoundException("User not found");
+        }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+       User user = getUserByEmail(email);
+       AuthUserDetail userDetails = new AuthUserDetail();
+       userDetails.setEmail(email);
+       userDetails.setPassword(user.getPassword());
+       userDetails.setType(user.getUserType());
+       return userDetails;
+    }
+
+    private UserType mapToUserType(String type) {
+        try {
+            return UserType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid user type: " + type);
+        }
     }
 
 }
