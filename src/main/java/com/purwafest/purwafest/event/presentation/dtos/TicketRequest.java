@@ -9,4 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketRequest {
+  private String name;
+  private String description;
+  private String imageUrl;
 }

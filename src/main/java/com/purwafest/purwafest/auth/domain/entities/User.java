@@ -38,7 +38,7 @@ public class User {
     private String msisdn;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_type")
+    @Column(name = "type")
     @JdbcType(value = PostgreSQLEnumJdbcType.class)
     private UserType userType;
 

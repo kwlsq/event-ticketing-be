@@ -34,9 +34,6 @@ public class Event {
   @Column(name = "description")
   private String description;
 
-  @Column(name = "image_url")
-  private String imageUrl;
-
   @Column(name = "date")
   private Instant date;
 
@@ -59,6 +56,16 @@ public class Event {
   @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
   private Set<EventTicketType> ticketTypes;
+
+  @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<Image> images;
+
+  @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<Review> reviews;
+
+  // many to one organizer
 
   @Column(name = "created_at")
   private Instant createdAt;
