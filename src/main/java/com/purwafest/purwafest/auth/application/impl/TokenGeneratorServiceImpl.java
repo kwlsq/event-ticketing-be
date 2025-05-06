@@ -10,9 +10,11 @@ import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
+@Service
 public class TokenGeneratorServiceImpl implements TokenGeneratorService {
     private final long ACCESS_TOKEN_EXPIRATION_TIME = 3600L; // 15 minutes
     private final long REFRESH_TOKEN_EXPIRATION_TIME = 604800L; // 7 days
