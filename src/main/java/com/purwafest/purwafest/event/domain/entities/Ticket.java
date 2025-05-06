@@ -24,7 +24,6 @@ public class Ticket {
   @Column(name = "id", nullable = false)
   private Integer id;
 
-  @NotNull
   @Column(name = "status", nullable = false)
   private TicketStatus status;
 

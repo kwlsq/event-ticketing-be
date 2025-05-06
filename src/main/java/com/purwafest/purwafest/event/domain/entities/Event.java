@@ -1,6 +1,7 @@
 package com.purwafest.purwafest.event.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -34,9 +35,6 @@ public class Event {
   @Column(name = "description")
   private String description;
 
-  @Column(name = "image_url")
-  private String imageUrl;
-
   @Column(name = "date")
   private Instant date;
 
@@ -57,8 +55,18 @@ public class Event {
   private EventStatus status;
 
   @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JsonIgnore
+  @JsonManagedReference
   private Set<EventTicketType> ticketTypes;
+
+  @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonManagedReference
+  private Set<Image> images;
+
+  @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<Review> reviews;
+
+  // many to one organizer
 
   @Column(name = "created_at")
   private Instant createdAt;

@@ -6,6 +6,7 @@ import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.event.domain.entities.Ticket;
 import com.purwafest.purwafest.event.domain.enums.TicketStatus;
 import com.purwafest.purwafest.event.domain.exceptions.TicketNotFoundException;
+import com.purwafest.purwafest.event.infrastructure.repositories.EventTicketTypeRepository;
 import com.purwafest.purwafest.event.infrastructure.repositories.TicketRepository;
 import com.purwafest.purwafest.event.presentation.dtos.TicketUpdateRequest;
 import org.springframework.stereotype.Service;
@@ -19,20 +20,23 @@ public class TicketServiceImpl implements TicketServices {
 
   private final TicketRepository ticketRepository;
   private final EventTicketTypeServices eventTicketTypeServices;
+  private final EventTicketTypeRepository eventTicketTypeRepository;
 
-  public TicketServiceImpl (TicketRepository ticketRepository, EventTicketTypeServices eventTicketTypeServices) {
+  public TicketServiceImpl (TicketRepository ticketRepository, EventTicketTypeServices eventTicketTypeServices, EventTicketTypeRepository eventTicketTypeRepository) {
     this.ticketRepository = ticketRepository;
     this.eventTicketTypeServices = eventTicketTypeServices;
+    this.eventTicketTypeRepository = eventTicketTypeRepository;
   }
 
   @Override
-  public List<Ticket> createTicket(EventTicketType eventTicketType, Integer quantity) {
+  public List<Ticket> createTicket(Integer quantity, Integer ticketTypeID) {
+    EventTicketType eventTicketType = eventTicketTypeRepository.findById(ticketTypeID).orElseThrow(() -> new RuntimeException("Ticket type not found!"));
     if (quantity > eventTicketType.getStock()) {
       throw new ArithmeticException("Ticket stock insufficient!");
     }
 
 //    Create list of ticket
-    List<Ticket> ticketList = new ArrayList<>();
+    List<Ticket> ticketList = new ArrayList<>(quantity);
 
 //    Count ticket that successfully created
     int createdTicket = 0;

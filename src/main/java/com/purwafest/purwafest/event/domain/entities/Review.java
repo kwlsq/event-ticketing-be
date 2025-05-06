@@ -1,16 +1,12 @@
 package com.purwafest.purwafest.event.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Filter;
 
-import java.math.BigInteger;
 import java.time.Instant;
-import java.util.Set;
 
 @Setter
 @Getter
@@ -18,41 +14,27 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "event_ticket_type")
+@Table(name = "review")
 @Filter(name = "deletedAtFilter", condition = "deleted_at is null")
-public class EventTicketType {
+public class Review {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "event_ticket_type_id_gen")
-  @SequenceGenerator(name = "event_ticket_type_id_gen", sequenceName = "event_ticket_type_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "review_id_gen")
+  @SequenceGenerator(name = "review_id_gen", sequenceName = "review_id_seq", allocationSize = 1)
   @Column(name = "id", nullable = false)
   private Integer id;
 
   @NotNull
-  @Column(name = "name", nullable = false)
-  private String name;
+  @Column(name = "rating")
+  private Integer rating;
 
   @NotNull
-  @Column(name = "price", nullable = false)
-  private BigInteger price;
-
-  @NotNull
-  @Column(name = "stock", nullable = false)
-  private Integer stock;
-
-  @Column(name = "available_qty")
-  private Integer availableQty;
-
-  @Column(name = "sell_date")
-  private Instant sellDate;
+  @Column(name = "review")
+  private String review;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "event_id", referencedColumnName = "id")
   @JsonBackReference
   private Event event;
-
-  @OneToMany(mappedBy = "eventTicketType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JsonManagedReference
-  private Set<Ticket> tickets;
 
   @Column(name = "created_at")
   private Instant createdAt;
@@ -65,9 +47,7 @@ public class EventTicketType {
 
   @PrePersist
   public void prePersist() {
-    if (this.createdAt == null) {
-      this.createdAt = Instant.now();
-    }
+    this.createdAt = Instant.now();
     this.modifiedAt = Instant.now();
   }
 

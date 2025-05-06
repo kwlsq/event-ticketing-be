@@ -25,7 +25,6 @@ public class EventRequest {
     return Event.builder()
         .name(name)
         .description(description)
-        .imageUrl(imageUrl)
         .location(location)
         .venue(venue)
         .isEventFree(isEventFree)
