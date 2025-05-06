@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Integer>, JpaSpecificationExecutor<User> {
-    long countByEmailAndUserType(String email, UserType userType);
-    Optional<User> findUserByEmailAndUserType(String email, UserType userType);
+    Optional<User> findUserByEmail(String email);
+    long countByEmail(String email);
 }
