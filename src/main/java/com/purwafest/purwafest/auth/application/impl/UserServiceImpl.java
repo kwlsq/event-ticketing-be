@@ -50,17 +50,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User login(User request){
-
-        Optional<User> foundUser = userRepository.findUserByEmail(request.getEmail());
-        if (foundUser.isEmpty() || !request.getPassword().equals(foundUser.get().getPassword())) {
-            throw new LoginFailedException("Invalid email or password");
-        }
-
-        return foundUser.get();
-    }
-
-    @Override
     public User getUserByEmail(String email) {
         Optional<User> user = userRepository.findUserByEmail(email);
         if (user.isPresent()) {
