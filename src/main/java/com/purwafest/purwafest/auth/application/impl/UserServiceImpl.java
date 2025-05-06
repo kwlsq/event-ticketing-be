@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
 
     private UserType mapToUserType(String type) {
         try {
-            return UserType.valueOf(type.toUpperCase());
+            return UserType.valueOf(type);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid user type: " + type);
         }
