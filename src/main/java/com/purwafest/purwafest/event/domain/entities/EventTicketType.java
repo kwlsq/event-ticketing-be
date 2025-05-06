@@ -2,6 +2,7 @@ package com.purwafest.purwafest.event.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -38,11 +39,9 @@ public class EventTicketType {
   @Column(name = "stock", nullable = false)
   private Integer stock;
 
-  @NotNull
   @Column(name = "available_qty")
   private Integer availableQty;
 
-  @NotNull
   @Column(name = "sell_date")
   private Instant sellDate;
 
@@ -52,7 +51,7 @@ public class EventTicketType {
   private Event event;
 
   @OneToMany(mappedBy = "eventTicketType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JsonIgnore
+  @JsonManagedReference
   private Set<Ticket> tickets;
 
   @Column(name = "created_at")
@@ -66,7 +65,9 @@ public class EventTicketType {
 
   @PrePersist
   public void prePersist() {
-    this.createdAt = Instant.now();
+    if (this.createdAt == null) {
+      this.createdAt = Instant.now();
+    }
     this.modifiedAt = Instant.now();
   }
 
