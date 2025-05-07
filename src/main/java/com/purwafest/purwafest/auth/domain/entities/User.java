@@ -1,6 +1,7 @@
 package com.purwafest.purwafest.auth.domain.entities;
 
 import com.purwafest.purwafest.auth.domain.enums.UserType;
+import com.purwafest.purwafest.referral.domain.entities.Referral;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -42,6 +44,9 @@ public class User {
     @JdbcType(value = PostgreSQLEnumJdbcType.class)
     private UserType userType;
 
+    @Column(name="code",nullable = true,length = 20,unique = true)
+    private String code;
+
     @ColumnDefault("now()")
     @Column(name = "created_at")
     private Instant createdAt;
@@ -57,9 +62,11 @@ public class User {
 
 //   one user many invoice
 
-//   one referrer one referral
+    @OneToMany(mappedBy = "referrer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Referral> referredUsers;
 
-//   one referral many referee
+    @OneToOne(mappedBy = "referee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Referral referral;
 
 //   one user many point
 
