@@ -3,6 +3,7 @@ package com.purwafest.purwafest.event.application.impl;
 import com.purwafest.purwafest.common.PaginatedResponse;
 import com.purwafest.purwafest.event.application.EventServices;
 import com.purwafest.purwafest.event.domain.entities.Event;
+import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventRepository;
 import com.purwafest.purwafest.event.infrastructure.repositories.specification.EventSpecification;
@@ -11,7 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EventServiceImpl implements EventServices {

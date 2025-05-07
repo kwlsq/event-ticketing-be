@@ -52,6 +52,7 @@ public class EventTicketType {
 
   @OneToMany(mappedBy = "eventTicketType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonManagedReference
+  @OrderBy("id ASC")
   private Set<Ticket> tickets;
 
   @Column(name = "created_at")

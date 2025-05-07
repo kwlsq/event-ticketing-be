@@ -1,7 +1,9 @@
 package com.purwafest.purwafest.event.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.purwafest.purwafest.auth.domain.entities.User;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -32,12 +34,15 @@ public class Event {
   @Column(name = "name", nullable = false)
   private String name;
 
+  @NotNull
   @Column(name = "description")
   private String description;
 
+  @NotNull
   @Column(name = "date")
   private Instant date;
 
+  @NotNull
   @Column(name = "venue")
   private String venue;
 
@@ -56,6 +61,7 @@ public class Event {
 
   @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonManagedReference
+  @OrderBy("id ASC")
   private Set<EventTicketType> ticketTypes;
 
   @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -66,7 +72,15 @@ public class Event {
   @JsonIgnore
   private Set<Review> reviews;
 
-  // many to one organizer
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "organizer_id", referencedColumnName = "id")
+  @JsonBackReference
+  private User user;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "category_id", referencedColumnName = "id")
+  @JsonBackReference
+  private Category category;
 
   @Column(name = "created_at")
   private Instant createdAt;

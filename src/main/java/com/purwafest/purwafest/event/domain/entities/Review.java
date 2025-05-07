@@ -1,6 +1,7 @@
 package com.purwafest.purwafest.event.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.purwafest.purwafest.auth.domain.entities.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -35,6 +36,11 @@ public class Review {
   @JoinColumn(name = "event_id", referencedColumnName = "id")
   @JsonBackReference
   private Event event;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  @JsonBackReference
+  private User user;
 
   @Column(name = "created_at")
   private Instant createdAt;
