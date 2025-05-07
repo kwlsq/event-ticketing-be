@@ -44,10 +44,18 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateUserException("Account with this email already exists");
         }
 
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
 
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
         request.setUserType(userType);
-        return userRepository.save(request);
+
+        User user =  userRepository.saveAndFlush(request);
+
+        if (user.getCode() == null || user.getCode().isBlank()) {
+            user.setCode(generateReferralCode(user.getEmail(), user.getId()));
+            user = userRepository.saveAndFlush(user); // Save again to persist the code
+        }
+
+        return user;
     }
 
     @Override
@@ -111,6 +119,12 @@ public class UserServiceImpl implements UserService {
         userRepository.saveAndFlush(user);
 
         return user;
+    }
+
+    private String generateReferralCode(String email, Integer userId) {
+        String prefix = email.split("@")[0].replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+        prefix = prefix.length() >= 4 ? prefix.substring(0, 4) : String.format("%-4s", prefix).replace(' ', 'X');
+        return prefix + String.format("%04d", userId);
     }
 
 }
