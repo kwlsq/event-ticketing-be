@@ -50,17 +50,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User login(User request){
-
-        Optional<User> foundUser = userRepository.findUserByEmail(request.getEmail());
-        if (foundUser.isEmpty() || !request.getPassword().equals(foundUser.get().getPassword())) {
-            throw new LoginFailedException("Invalid email or password");
-        }
-
-        return foundUser.get();
-    }
-
-    @Override
     public User getUserByEmail(String email) {
         Optional<User> user = userRepository.findUserByEmail(email);
         if (user.isPresent()) {
@@ -85,6 +74,18 @@ public class UserServiceImpl implements UserService {
             return UserType.valueOf(type);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid user type: " + type);
+        }
+    }
+
+    @Override
+    public User profile(Integer id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            User foundUser = user.get();
+            foundUser.setPassword(null); // Don't send password to the client
+            return foundUser;
+        } else {
+            throw new UserNotFoundException("User not found");
         }
     }
 
