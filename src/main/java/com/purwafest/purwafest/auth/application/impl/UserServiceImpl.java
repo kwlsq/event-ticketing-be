@@ -8,6 +8,7 @@ import com.purwafest.purwafest.auth.domain.exceptions.LoginFailedException;
 import com.purwafest.purwafest.auth.domain.exceptions.UserNotFoundException;
 import com.purwafest.purwafest.auth.domain.valueObject.AuthUserDetail;
 import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
+import com.purwafest.purwafest.auth.presentation.dtos.UpdateProfileRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -87,6 +88,29 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new UserNotFoundException("User not found");
         }
+    }
+
+    @Override
+    public User updateProfile(UpdateProfileRequest request, Integer userId){
+        if(userId == null){
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+
+        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User not found"));
+
+        if(request.getName() != null){
+            user.setName(request.getName());
+        }
+        if(request.getEmail() != null){
+            user.setEmail(request.getEmail());
+        }
+        if(request.getMsisdn() != null){
+            user.setMsisdn(request.getMsisdn());
+        }
+
+        userRepository.saveAndFlush(user);
+
+        return user;
     }
 
 }

@@ -2,6 +2,7 @@ package com.purwafest.purwafest.auth.presentation;
 
 import com.purwafest.purwafest.auth.application.UserService;
 import com.purwafest.purwafest.auth.presentation.dtos.RegisterRequest;
+import com.purwafest.purwafest.auth.presentation.dtos.UpdateProfileRequest;
 import com.purwafest.purwafest.common.Response;
 import com.purwafest.purwafest.common.security.Claims;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,15 @@ public class UserRestController {
         return Response.successfulResponse(
                 "Register Success",
                 userService.register(request.toUser(), registrationType)
+        );
+    }
+
+    @PutMapping
+    public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileRequest request){
+        Integer id = Claims.getUserId();
+        return Response.successfulResponse(
+                "User updated successfully",
+                userService.updateProfile(request,id)
         );
     }
 }
