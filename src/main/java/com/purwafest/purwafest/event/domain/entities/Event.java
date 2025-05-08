@@ -1,6 +1,7 @@
 package com.purwafest.purwafest.event.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.purwafest.purwafest.auth.domain.entities.User;
@@ -21,7 +22,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "event")
-@Filter(name = "deletedAtFilter", condition = "deleted_at is null")
+@Filter(name = "deletedAtFilter", condition = "deleted_at IS NULL")
 public class Event {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "event_id_gen")
@@ -38,8 +39,8 @@ public class Event {
   @Column(name = "description")
   private String description;
 
-  @NotNull
   @Column(name = "date")
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   private Instant date;
 
   @NotNull

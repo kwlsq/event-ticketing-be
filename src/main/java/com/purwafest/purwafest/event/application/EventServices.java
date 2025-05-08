@@ -10,4 +10,6 @@ import java.util.List;
 public interface EventServices {
   PaginatedResponse<Event> getAllEvent(Pageable pageable, String search);
   Event createEvent(EventRequest request);
+  void deleteEvent(Integer eventID);
+  Event updateEvent(EventRequest newEvent);
 }

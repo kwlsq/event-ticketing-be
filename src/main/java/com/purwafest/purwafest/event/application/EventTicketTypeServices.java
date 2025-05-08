@@ -5,5 +5,5 @@ import com.purwafest.purwafest.event.presentation.dtos.EventTicketTypeRequest;
 
 public interface EventTicketTypeServices {
   EventTicketType createTicketType(EventTicketTypeRequest eventTicketTypeRequest, Integer eventID);
-  EventTicketType updateTicketType(Integer ticketTypeID, Integer ticketBought);
+  void updateTicketType(Integer ticketTypeID, Integer ticketBought);
 }

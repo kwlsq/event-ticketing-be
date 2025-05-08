@@ -68,6 +68,7 @@ public class EventTicketType {
   public void prePersist() {
     this.createdAt = Instant.now();
     this.modifiedAt = Instant.now();
+    this.availableQty = this.stock;
   }
 
   @PreUpdate

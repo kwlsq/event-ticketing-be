@@ -44,6 +44,17 @@ public class EventRestController {
     );
   }
 
+  @DeleteMapping("/{eventID}")
+  public ResponseEntity<?> deleteEvent(@PathVariable Integer eventID) {
+    try {
+      eventServices.deleteEvent(eventID);
+      return ResponseEntity.ok("Event deleted!");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(e.getMessage());
+    }
+  }
+
   private Sort.Order getSortOrder(String sort) {
     String[] sortParts = sort.split(",");
     String property = sortParts[0];
