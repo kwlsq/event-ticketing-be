@@ -4,6 +4,7 @@ import com.purwafest.purwafest.auth.application.UserService;
 import com.purwafest.purwafest.auth.presentation.dtos.RegisterRequest;
 import com.purwafest.purwafest.common.Response;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,11 +32,11 @@ public class UserRestController {
         );
     }
 
-    @PostMapping("/login/{loginType}")
-    public ResponseEntity<?> login(@RequestBody RegisterRequest request, @PathVariable String loginType) {
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody RegisterRequest request) {
         return Response.successfulResponse(
                 "Login Success",
-                userService.login(request.toUser(), loginType)
+                userService.login(request.toUser())
         );
     }
 }
