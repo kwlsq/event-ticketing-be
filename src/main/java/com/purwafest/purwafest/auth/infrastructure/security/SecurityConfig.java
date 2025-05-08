@@ -4,6 +4,7 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.purwafest.purwafest.auth.application.UserService;
+import com.purwafest.purwafest.auth.infrastructure.security.filters.BlackListTokenFilter;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.SecretKey;
@@ -35,11 +37,13 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final JwtConfigProperties jwtConfigProperties;
     private final UserService userService;
+    private final BlackListTokenFilter blackListTokenFilter;
 
-    public SecurityConfig(PasswordEncoder passwordEncoder, JwtConfigProperties jwtConfigProperties, UserService userService){
+    public SecurityConfig(PasswordEncoder passwordEncoder, JwtConfigProperties jwtConfigProperties, UserService userService, BlackListTokenFilter blackListTokenFilter){
         this.passwordEncoder = passwordEncoder;
         this.jwtConfigProperties = jwtConfigProperties;
         this.userService = userService;
+        this.blackListTokenFilter = blackListTokenFilter;
     }
 
     @Bean
@@ -56,42 +60,45 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-//                          .requestMatchers("/api/v1/event").authenticated()
+                        .anyRequest().permitAll() // permit semua
+//                Define public endpoints below
+//                .requestMatchers("/api/v1/auth/login", "/api/v1/user/register", "/api/v1/auth/refresh-token").permitAll()
+//                // Define protected endpoints below
+//                .anyRequest().authenticated()
                 )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(oauth2->{
-                    oauth2.jwt(jwt->jwt.decoder(jwtDecoder()));
-                    oauth2.bearerTokenResolver(request->{
-                        Cookie[] cookies = request.getCookies();
-                        if(cookies != null){
-                            for(Cookie cookie : cookies){
-                                if(cookie.getName().equals("SID")){
-                                    return cookie.getValue();
-                                }
-                            }
-                        }
-                        String token = request.getHeader("Authorization");
-                        if(token != null && token.startsWith("Bearer ")){
-                            return token.substring(7);
-                        }
-                        return null;
-                    });
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(blackListTokenFilter, BearerTokenAuthenticationFilter.class)
+                .oauth2ResourceServer(oauth2 -> {
+                    oauth2.jwt(jwt -> jwt.decoder(jwtDecoder()));
+                    oauth2.bearerTokenResolver(ExtractTokenHelper::getTokenFromRequest);
                 })
                 .userDetailsService(userService)
                 .build();
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(){
-        SecretKey secretKey = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(),"HmacSHA256");
+    public JwtDecoder jwtDecoder() {
+        SecretKey secretKey = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(), "HmacSHA256");
         return NimbusJwtDecoder.withSecretKey(secretKey).build();
     }
 
     @Bean
-    public JwtEncoder jwtEncoder(){
-        SecretKey secretKey = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(),"HmacSHA256");
+    public JwtEncoder jwtEncoder() {
+        SecretKey secretKey = new SecretKeySpec(jwtConfigProperties.getSecret().getBytes(), "HmacSHA256");
         JWKSource<SecurityContext> immutableSecret = new ImmutableSecret<SecurityContext>(secretKey);
         return new NimbusJwtEncoder(immutableSecret);
+    }
+
+    @Bean
+    public JwtDecoder refreshTokenDecoder() {
+        SecretKey refreshSecretKey = new SecretKeySpec(jwtConfigProperties.getRefreshSecret().getBytes(), "HmacSHA256");
+        return NimbusJwtDecoder.withSecretKey(refreshSecretKey).build();
+    }
+
+    @Bean
+    public JwtEncoder refreshTokenEncoder() {
+        SecretKey refreshSecretKey = new SecretKeySpec(jwtConfigProperties.getRefreshSecret().getBytes(), "HmacSHA256");
+        JWKSource<SecurityContext> immutableRefreshSecret = new ImmutableSecret<SecurityContext>(refreshSecretKey);
+        return new NimbusJwtEncoder(immutableRefreshSecret);
     }
 }
