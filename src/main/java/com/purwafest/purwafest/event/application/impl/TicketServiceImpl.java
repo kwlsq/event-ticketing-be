@@ -66,14 +66,4 @@ public class TicketServiceImpl implements TicketServices {
     }
     return ticketRepository.saveAll(ticketList);
   }
-
-  @Override
-  public Ticket deleteTicket(Integer ticketID) {
-    Optional<Ticket> ticket = ticketRepository.findById(ticketID);
-    if (ticket.isPresent()) {
-      ticketRepository.deleteById(ticketID);
-      return ticket.get();
-    }
-    throw new TicketNotFoundException("Ticket with ID " + ticketID + " not found!");
-  }
 }

@@ -8,5 +8,4 @@ import java.util.List;
 public interface TicketServices {
   void createTicket(Integer quantity, Integer ticketTypeID);
   List<Ticket> updateTicketStatus(TicketUpdateRequest request);
-  Ticket deleteTicket(Integer ticketID);
 }

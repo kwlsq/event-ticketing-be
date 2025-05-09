@@ -7,6 +7,7 @@ import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventRepository;
 import com.purwafest.purwafest.event.infrastructure.repositories.specification.EventSpecification;
+import com.purwafest.purwafest.event.presentation.dtos.EventListResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -28,19 +30,26 @@ public class EventServiceImpl implements EventServices {
   }
 
   @Override
-  public PaginatedResponse<Event> getAllEvent(Pageable pageable, String search) {
+  public PaginatedResponse<EventListResponse> getAllEvent(Pageable pageable, String search) {
 
     Page<Event> data = eventRepository.findAll(EventSpecification.getFilteredEvent(search), pageable).map(event -> event);
+
+    List<EventListResponse> eventListResponses = new ArrayList<>();
+
+    data.getContent().forEach(event -> {
+      EventListResponse response = EventListResponse.toResponse(event);
+      eventListResponses.add(response);
+    });
 
     boolean hasNext = data.getNumber() < data.getTotalPages() - 1;
     boolean hasPrevious = data.getNumber() > 0;
 
-    PaginatedResponse<Event> paginatedResponse = new PaginatedResponse<>();
+    PaginatedResponse<EventListResponse> paginatedResponse = new PaginatedResponse<>();
     paginatedResponse.setPage(pageable.getPageNumber());
     paginatedResponse.setSize(pageable.getPageSize());
     paginatedResponse.setTotalElements(data.getTotalElements());
     paginatedResponse.setTotalPages(data.getTotalPages());
-    paginatedResponse.setContent(data.getContent());
+    paginatedResponse.setContent(eventListResponses);
     paginatedResponse.setHasNext(hasNext);
     paginatedResponse.setHasPrevious(hasPrevious);
 
