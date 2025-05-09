@@ -60,8 +60,8 @@ public class User {
     private Instant deletedAt;
 
 //   one ticket one user
-    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Ticket> tickets;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<Ticket> tickets;
 
 //   one user many invoice
 
@@ -71,7 +71,7 @@ public class User {
     @OneToOne(mappedBy = "referee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Referral referral;
 
-    @OneToMany(mappedBy = "point", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Points> points;
 
     @PrePersist
