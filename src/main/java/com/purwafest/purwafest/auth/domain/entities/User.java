@@ -1,6 +1,8 @@
 package com.purwafest.purwafest.auth.domain.entities;
 
 import com.purwafest.purwafest.auth.domain.enums.UserType;
+import com.purwafest.purwafest.event.domain.entities.Ticket;
+import com.purwafest.purwafest.point.domain.entities.Points;
 import com.purwafest.purwafest.referral.domain.entities.Referral;
 import jakarta.persistence.*;
 import lombok.*;
@@ -59,6 +61,8 @@ public class User {
     private Instant deletedAt;
 
 //   one ticket one user
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Ticket> tickets;
 
 //   one user many invoice
 
@@ -68,7 +72,8 @@ public class User {
     @OneToOne(mappedBy = "referee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Referral referral;
 
-//   one user many point
+    @OneToMany(mappedBy = "point", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Points> points;
 
     @PrePersist
     public void prePersist() {
