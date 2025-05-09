@@ -2,13 +2,13 @@ package com.purwafest.purwafest.event.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.purwafest.purwafest.auth.domain.entities.User;
-import com.purwafest.purwafest.event.domain.enums.TicketStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Filter;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -16,23 +16,32 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "ticket")
+@Table(name = "discount")
 @Filter(name = "deletedAtFilter", condition = "deleted_at is null")
-public class Ticket {
+public class Discount {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticket_id_gen")
-  @SequenceGenerator(name = "ticket_id_gen", sequenceName = "ticket_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "discount_id_gen")
+  @SequenceGenerator(name = "discount_id_gen", sequenceName = "discount_id_seq", allocationSize = 1)
   @Column(name = "id", nullable = false)
   private Integer id;
 
-  @Column(name = "status", nullable = false)
-  private TicketStatus status;
+  @NotNull
+  @Column(name = "is_used", nullable = false)
+  private boolean isUsed;
 
-  @Column(name = "is_checked_in")
-  private boolean isCheckedIn;
+  @NotNull
+  @Column(name = "code_voucher")
+  private UUID codeVoucher;
 
-  @Column(name = "checked_in_at")
-  private Instant checkedInAt;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  @JsonBackReference
+  private User user;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "promotion_id", referencedColumnName = "id")
+  @JsonBackReference
+  private Promotion promotion;
 
   @Column(name = "created_at")
   private Instant createdAt;
@@ -42,16 +51,6 @@ public class Ticket {
 
   @Column(name = "deleted_at")
   private Instant deletedAt;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "event_ticket_type_id", referencedColumnName = "id")
-  @JsonBackReference
-  private EventTicketType eventTicketType;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", referencedColumnName = "id")
-  @JsonBackReference
-  private User user;
 
   @PrePersist
   public void prePersist() {

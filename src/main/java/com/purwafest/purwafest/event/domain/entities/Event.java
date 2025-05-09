@@ -70,8 +70,12 @@ public class Event {
   private Set<Image> images;
 
   @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JsonIgnore
+  @JsonManagedReference
   private Set<Review> reviews;
+
+  @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonManagedReference
+  private Set<Promotion> promotions;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "organizer_id", referencedColumnName = "id")
