@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.annotations.Filter;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -15,32 +16,32 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "review")
+@Table(name = "discount")
 @Filter(name = "deletedAtFilter", condition = "deleted_at is null")
-public class Review {
+public class Discount {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "review_id_gen")
-  @SequenceGenerator(name = "review_id_gen", sequenceName = "review_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "discount_id_gen")
+  @SequenceGenerator(name = "discount_id_gen", sequenceName = "discount_id_seq", allocationSize = 1)
   @Column(name = "id", nullable = false)
   private Integer id;
 
   @NotNull
-  @Column(name = "rating")
-  private Integer rating;
+  @Column(name = "is_used", nullable = false)
+  private boolean isUsed;
 
   @NotNull
-  @Column(name = "review")
-  private String review;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "event_id", referencedColumnName = "id")
-  @JsonBackReference
-  private Event event;
+  @Column(name = "code_voucher")
+  private UUID codeVoucher;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   @JsonBackReference
   private User user;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "promotion_id", referencedColumnName = "id")
+  @JsonBackReference
+  private Promotion promotion;
 
   @Column(name = "created_at")
   private Instant createdAt;

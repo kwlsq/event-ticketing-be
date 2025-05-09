@@ -11,6 +11,7 @@ import com.purwafest.purwafest.event.infrastructure.repositories.TicketRepositor
 import com.purwafest.purwafest.event.presentation.dtos.TicketUpdateRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,7 @@ public class TicketServiceImpl implements TicketServices {
   }
 
   @Override
-  public List<Ticket> createTicket(Integer quantity, Integer ticketTypeID) {
+  public void createTicket(Integer quantity, Integer ticketTypeID) {
     EventTicketType eventTicketType = eventTicketTypeRepository.findById(ticketTypeID).orElseThrow(() -> new RuntimeException("Ticket type not found!"));
     if (quantity > eventTicketType.getStock()) {
       throw new ArithmeticException("Ticket stock insufficient!");
@@ -53,7 +54,7 @@ public class TicketServiceImpl implements TicketServices {
 //    Update the ticket stock from organizer
     eventTicketTypeServices.updateTicketType(eventTicketType.getId(), createdTicket);
 
-    return ticketRepository.saveAll(ticketList);
+    ticketRepository.saveAll(ticketList);
   }
 
   @Override
@@ -61,17 +62,8 @@ public class TicketServiceImpl implements TicketServices {
     List<Ticket> ticketList = ticketRepository.findAllById(request.getTicketList());
     for (Ticket ticket : ticketList) {
       ticket.setStatus(request.getStatus());
+      ticket.setModifiedAt(Instant.now());
     }
     return ticketRepository.saveAll(ticketList);
-  }
-
-  @Override
-  public Ticket deleteTicket(Integer ticketID) {
-    Optional<Ticket> ticket = ticketRepository.findById(ticketID);
-    if (ticket.isPresent()) {
-      ticketRepository.deleteById(ticketID);
-      return ticket.get();
-    }
-    throw new TicketNotFoundException("Ticket with ID " + ticketID + " not found!");
   }
 }

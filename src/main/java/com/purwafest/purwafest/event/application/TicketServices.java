@@ -6,7 +6,6 @@ import com.purwafest.purwafest.event.presentation.dtos.TicketUpdateRequest;
 import java.util.List;
 
 public interface TicketServices {
-  List<Ticket> createTicket(Integer quantity, Integer ticketTypeID);
+  void createTicket(Integer quantity, Integer ticketTypeID);
   List<Ticket> updateTicketStatus(TicketUpdateRequest request);
-  Ticket deleteTicket(Integer ticketID);
 }

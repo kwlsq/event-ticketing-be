@@ -52,6 +52,7 @@ public class EventTicketType {
 
   @OneToMany(mappedBy = "eventTicketType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonManagedReference
+  @OrderBy("id ASC")
   private Set<Ticket> tickets;
 
   @Column(name = "created_at")
@@ -65,10 +66,9 @@ public class EventTicketType {
 
   @PrePersist
   public void prePersist() {
-    if (this.createdAt == null) {
-      this.createdAt = Instant.now();
-    }
+    this.createdAt = Instant.now();
     this.modifiedAt = Instant.now();
+    this.availableQty = this.stock;
   }
 
   @PreUpdate

@@ -7,8 +7,8 @@ import com.purwafest.purwafest.event.infrastructure.repositories.EventRepository
 import com.purwafest.purwafest.event.infrastructure.repositories.EventTicketTypeRepository;
 import com.purwafest.purwafest.event.presentation.dtos.EventTicketTypeRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -41,14 +41,14 @@ public class EventTicketTypeServiceImpl implements EventTicketTypeServices {
   }
 
   @Override
-  public EventTicketType updateTicketType(Integer ticketTypeID, Integer ticketBought) {
+  public void updateTicketType(Integer ticketTypeID, Integer ticketBought) {
     Optional<EventTicketType> ticketTypeOptional = eventTicketTypeRepository.findById(ticketTypeID);
     if (ticketTypeOptional.isEmpty()) {
       throw new RuntimeException();
     }
 
     EventTicketType eventTicketType = ticketTypeOptional.get();
-    eventTicketType.setStock(eventTicketType.getStock() - ticketBought);
-    return  eventTicketType;
+    eventTicketType.setAvailableQty(eventTicketType.getStock() - ticketBought);
+    eventTicketType.setModifiedAt(Instant.now());
   }
 }

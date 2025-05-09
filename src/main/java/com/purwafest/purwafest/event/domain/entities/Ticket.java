@@ -1,6 +1,7 @@
 package com.purwafest.purwafest.event.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.purwafest.purwafest.auth.domain.entities.User;
 import com.purwafest.purwafest.event.domain.enums.TicketStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,12 @@ public class Ticket {
   @Column(name = "status", nullable = false)
   private TicketStatus status;
 
+  @Column(name = "is_checked_in")
+  private boolean isCheckedIn;
+
+  @Column(name = "checked_in_at")
+  private Instant checkedInAt;
+
   @Column(name = "created_at")
   private Instant createdAt;
 
@@ -40,6 +47,11 @@ public class Ticket {
   @JoinColumn(name = "event_ticket_type_id", referencedColumnName = "id")
   @JsonBackReference
   private EventTicketType eventTicketType;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  @JsonBackReference
+  private User user;
 
   @PrePersist
   public void prePersist() {
