@@ -2,10 +2,10 @@ package com.purwafest.purwafest.event.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.purwafest.purwafest.auth.domain.entities.User;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
+import com.purwafest.purwafest.promotion.domain.entities.Promotion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

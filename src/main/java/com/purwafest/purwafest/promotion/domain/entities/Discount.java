@@ -1,4 +1,4 @@
-package com.purwafest.purwafest.event.domain.entities;
+package com.purwafest.purwafest.promotion.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.purwafest.purwafest.auth.domain.entities.User;

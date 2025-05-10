@@ -41,6 +41,10 @@ public class EventServiceImpl implements EventServices {
       eventListResponses.add(response);
     });
 
+    return getEventListResponsePaginatedResponse(pageable, data, eventListResponses);
+  }
+
+  private static PaginatedResponse<EventListResponse> getEventListResponsePaginatedResponse(Pageable pageable, Page<Event> data, List<EventListResponse> eventListResponses) {
     boolean hasNext = data.getNumber() < data.getTotalPages() - 1;
     boolean hasPrevious = data.getNumber() > 0;
 
@@ -52,7 +56,6 @@ public class EventServiceImpl implements EventServices {
     paginatedResponse.setContent(eventListResponses);
     paginatedResponse.setHasNext(hasNext);
     paginatedResponse.setHasPrevious(hasPrevious);
-
     return paginatedResponse;
   }
 
