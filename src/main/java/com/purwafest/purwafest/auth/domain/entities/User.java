@@ -1,8 +1,7 @@
 package com.purwafest.purwafest.auth.domain.entities;
 
 import com.purwafest.purwafest.auth.domain.enums.UserType;
-import com.purwafest.purwafest.event.domain.entities.Ticket;
-import com.purwafest.purwafest.point.domain.entities.Points;
+import com.purwafest.purwafest.point.domain.entities.Point;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -72,7 +71,7 @@ public class User {
     private Referral referral;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Points> points;
+    private List<Point> points;
 
     @PrePersist
     public void prePersist() {

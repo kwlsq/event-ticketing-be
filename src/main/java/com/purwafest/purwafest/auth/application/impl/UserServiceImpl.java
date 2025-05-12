@@ -99,6 +99,10 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    private void handlePoints(){
+
+    }
+
     @Override
     public User getUserByEmail(String email) {
         Optional<User> user = userRepository.findUserByEmail(email);
