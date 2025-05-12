@@ -1,15 +1,11 @@
-package com.purwafest.purwafest.referral.domain.entities;
+package com.purwafest.purwafest.auth.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.purwafest.purwafest.auth.domain.entities.User;
-import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Filter;
 
 import java.time.Instant;
-import java.util.Set;
 
 @Getter
 @Setter

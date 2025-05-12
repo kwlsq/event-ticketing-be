@@ -15,6 +15,7 @@ public class RegisterRequest {
     private String password;
     private String msisdn;
     private UserType userType;
+    private String code;
 
     public User toUser() {
         return User.builder()
@@ -23,6 +24,7 @@ public class RegisterRequest {
                 .password(password)
                 .msisdn(msisdn)
                 .userType(userType)
+                .code(code)
                 .build();
     }
 }

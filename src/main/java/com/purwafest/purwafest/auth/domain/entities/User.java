@@ -3,7 +3,6 @@ package com.purwafest.purwafest.auth.domain.entities;
 import com.purwafest.purwafest.auth.domain.enums.UserType;
 import com.purwafest.purwafest.event.domain.entities.Ticket;
 import com.purwafest.purwafest.point.domain.entities.Points;
-import com.purwafest.purwafest.referral.domain.entities.Referral;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;

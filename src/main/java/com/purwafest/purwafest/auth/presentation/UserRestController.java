@@ -30,7 +30,7 @@ public class UserRestController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest request, @PathVariable String registrationType) {
         return Response.successfulResponse(
                 "Register Success",
-                userService.register(request.toUser(), registrationType)
+                userService.register(request, registrationType)
         );
     }
 
