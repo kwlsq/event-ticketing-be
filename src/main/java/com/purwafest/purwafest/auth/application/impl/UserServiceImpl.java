@@ -1,13 +1,17 @@
 package com.purwafest.purwafest.auth.application.impl;
 
 import com.purwafest.purwafest.auth.application.UserService;
+import com.purwafest.purwafest.auth.domain.entities.Referral;
 import com.purwafest.purwafest.auth.domain.entities.User;
 import com.purwafest.purwafest.auth.domain.enums.UserType;
 import com.purwafest.purwafest.auth.domain.exceptions.DuplicateUserException;
 import com.purwafest.purwafest.auth.domain.exceptions.LoginFailedException;
 import com.purwafest.purwafest.auth.domain.exceptions.UserNotFoundException;
 import com.purwafest.purwafest.auth.domain.valueObject.AuthUserDetail;
+import com.purwafest.purwafest.auth.infrastructure.repository.ReferralRepository;
 import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
+import com.purwafest.purwafest.auth.presentation.dtos.ReferralRequest;
+import com.purwafest.purwafest.auth.presentation.dtos.RegisterRequest;
 import com.purwafest.purwafest.auth.presentation.dtos.UpdateProfileRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,39 +27,76 @@ public class UserServiceImpl implements UserService {
     //Dependency injection from repositories
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ReferralRepository referralRepository;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder){
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ReferralRepository referralRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.referralRepository = referralRepository;
     }
 
     @Override
-    public List<User> getAll(){
+    public List<User> getAll() {
         return userRepository.findAll();
     }
 
     @Override
     @Transactional
-    public User register(User request, String registrationType){
-        UserType userType = mapToUserType(registrationType);
+    public User register(RegisterRequest request, String registrationType) {
+        validateUniqueEmail(request.getEmail());
 
-        long userWithSameEmailCount = userRepository.countByEmail(request.getEmail());
+        // Create the user
+        User user = createUser(request.toUser(), registrationType);
+
+        // Generate the referral code
+        generateReferralCode(user);
+
+        // Handle the referral using the original request
+        handleReferral(user, request);
+
+        return user;
+    }
+
+    private void validateUniqueEmail(String email) {
+        long userWithSameEmailCount = userRepository.countByEmail(email);
         if (userWithSameEmailCount != 0) {
             throw new DuplicateUserException("Account with this email already exists");
         }
+    }
 
+    private User createUser(User request, String registrationType) {
+        UserType userType = mapToUserType(registrationType);
 
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         request.setUserType(userType);
 
-        User user =  userRepository.saveAndFlush(request);
+        return userRepository.saveAndFlush(request);
+    }
 
-        if (user.getCode() == null || user.getCode().isBlank()) {
-            user.setCode(generateReferralCode(user.getEmail(), user.getId()));
-            user = userRepository.saveAndFlush(user); // Save again to persist the code
+    private void generateReferralCode(User user) {
+        user.setCode(generateReferralCode(user.getEmail(), user.getId()));
+        user = userRepository.saveAndFlush(user);
+    }
+
+    private void handleReferral(User user, RegisterRequest request) {
+        String referralCode = request.getCode();
+
+        if (referralCode != null && !referralCode.isBlank()) {
+            Optional<User> referral = userRepository.findUserByCode(referralCode);
+            if (referral.isPresent()) {
+                User referrer = referral.get();
+
+                if (!referrer.getId().equals(user.getId())) { // Ensure referrer and referee are not the same
+                    Referral referralRequest = new ReferralRequest(referrer.getId(), user.getId()).toReferral(referrer, user);
+                    referralRepository.save(referralRequest);
+                } else {
+                    throw new IllegalArgumentException("A user cannot refer themselves.");
+                }
+            } else {
+                throw new IllegalArgumentException("Referrer not found.");
+            }
         }
-
-        return user;
     }
 
     @Override
@@ -70,12 +111,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-       User user = getUserByEmail(email);
-       AuthUserDetail userDetails = new AuthUserDetail();
-       userDetails.setEmail(email);
-       userDetails.setPassword(user.getPassword());
-       userDetails.setType(user.getUserType());
-       return userDetails;
+        User user = getUserByEmail(email);
+        AuthUserDetail userDetails = new AuthUserDetail();
+        userDetails.setEmail(email);
+        userDetails.setPassword(user.getPassword());
+        userDetails.setType(user.getUserType());
+        return userDetails;
     }
 
     private UserType mapToUserType(String type) {
@@ -99,20 +140,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateProfile(UpdateProfileRequest request, Integer userId){
-        if(userId == null){
+    public User updateProfile(UpdateProfileRequest request, Integer userId) {
+        if (userId == null) {
             throw new IllegalArgumentException("User ID cannot be null");
         }
 
-        User user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if(request.getName() != null){
+        if (request.getName() != null) {
             user.setName(request.getName());
         }
-        if(request.getEmail() != null){
+        if (request.getEmail() != null) {
             user.setEmail(request.getEmail());
         }
-        if(request.getMsisdn() != null){
+        if (request.getMsisdn() != null) {
             user.setMsisdn(request.getMsisdn());
         }
 
