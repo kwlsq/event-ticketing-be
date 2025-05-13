@@ -3,6 +3,7 @@ package com.purwafest.purwafest.event.domain.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.purwafest.purwafest.invoice.domain.entities.InvoiceItems;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -54,6 +55,10 @@ public class EventTicketType {
   @JsonManagedReference
   @OrderBy("id ASC")
   private Set<Ticket> tickets;
+
+  @OneToMany(mappedBy = "eventTicketType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonManagedReference
+  private Set<InvoiceItems> invoiceItems;
 
   @Column(name = "created_at")
   private Instant createdAt;

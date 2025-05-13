@@ -9,5 +9,4 @@ public interface TicketServices {
   void createTicket(Integer quantity, Integer ticketTypeID);
   List<Ticket> updateTicketStatus(TicketUpdateRequest request);
   List<Ticket> getTicketByUserID(Integer userID);
-  List<Ticket> getAllTicket();
 }

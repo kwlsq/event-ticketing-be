@@ -7,6 +7,7 @@ import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventRepository;
 import com.purwafest.purwafest.event.infrastructure.repositories.specification.EventSpecification;
+import com.purwafest.purwafest.event.presentation.dtos.EventDetailsResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventListResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventRequest;
 import org.springframework.data.domain.Page;
@@ -94,5 +95,11 @@ public class EventServiceImpl implements EventServices {
     savedEvent.setLocation(event.getLocation());
 
     return savedEvent;
+  }
+
+  @Override
+  public EventDetailsResponse getCurrentEvent(Integer eventID) {
+    Event event = eventRepository.findById(eventID).orElseThrow(() -> new RuntimeException("Event not found!"));
+    return EventDetailsResponse.toResponse(event);
   }
 }

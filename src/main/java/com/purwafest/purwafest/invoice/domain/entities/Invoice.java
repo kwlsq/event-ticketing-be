@@ -1,5 +1,6 @@
 package com.purwafest.purwafest.invoice.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.purwafest.purwafest.invoice.domain.enums.PaymentStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.Filter;
 
 import java.math.BigInteger;
 import java.time.Instant;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -20,7 +22,7 @@ import java.time.Instant;
 public class Invoice {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "invoice_id_gen")
-  @SequenceGenerator(name = "invoiceid_gen", sequenceName = "invoice_id_seq", allocationSize = 1)
+  @SequenceGenerator(name = "invoice_id_gen", sequenceName = "invoice_id_seq", allocationSize = 1)
   @Column(name = "id", nullable = false)
   private Integer id;
 
@@ -64,6 +66,10 @@ public class Invoice {
 
   @Column(name = "deleted_at")
   private Instant deletedAt;
+
+  @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonManagedReference
+  private Set<InvoiceItems> invoiceItems;
 
   @PrePersist
   public void prePersist() {

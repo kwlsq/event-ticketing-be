@@ -80,9 +80,4 @@ public class TicketServiceImpl implements TicketServices {
   public List<Ticket> getTicketByUserID(Integer userID) {
     return ticketRepository.findAllByUser_Id(userID);
   }
-
-  @Override
-  public List<Ticket> getAllTicket() {
-    return ticketRepository.findAll();
-  }
 }
