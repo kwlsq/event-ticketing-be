@@ -7,6 +7,7 @@ import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventRepository;
 import com.purwafest.purwafest.event.infrastructure.repositories.specification.EventSpecification;
+import com.purwafest.purwafest.event.presentation.dtos.EventDetailsResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventListResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventRequest;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,10 @@ public class EventServiceImpl implements EventServices {
       eventListResponses.add(response);
     });
 
+    return getEventListResponsePaginatedResponse(pageable, data, eventListResponses);
+  }
+
+  private static PaginatedResponse<EventListResponse> getEventListResponsePaginatedResponse(Pageable pageable, Page<Event> data, List<EventListResponse> eventListResponses) {
     boolean hasNext = data.getNumber() < data.getTotalPages() - 1;
     boolean hasPrevious = data.getNumber() > 0;
 
@@ -52,7 +57,6 @@ public class EventServiceImpl implements EventServices {
     paginatedResponse.setContent(eventListResponses);
     paginatedResponse.setHasNext(hasNext);
     paginatedResponse.setHasPrevious(hasPrevious);
-
     return paginatedResponse;
   }
 
@@ -91,5 +95,11 @@ public class EventServiceImpl implements EventServices {
     savedEvent.setLocation(event.getLocation());
 
     return savedEvent;
+  }
+
+  @Override
+  public EventDetailsResponse getCurrentEvent(Integer eventID) {
+    Event event = eventRepository.findById(eventID).orElseThrow(() -> new RuntimeException("Event not found!"));
+    return EventDetailsResponse.toResponse(event);
   }
 }

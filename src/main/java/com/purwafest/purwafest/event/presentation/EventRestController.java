@@ -44,6 +44,14 @@ public class EventRestController {
     );
   }
 
+  @GetMapping("/{eventID}")
+  public ResponseEntity<?> getCurrentEvent(@PathVariable Integer eventID) {
+    return Response.successfulResponse(
+        "Fetched event successfully!",
+        eventServices.getCurrentEvent(eventID)
+    );
+  }
+
   @DeleteMapping("/{eventID}")
   public ResponseEntity<?> deleteEvent(@PathVariable Integer eventID) {
     try {

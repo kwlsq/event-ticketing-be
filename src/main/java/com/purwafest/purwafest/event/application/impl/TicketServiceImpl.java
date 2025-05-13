@@ -1,5 +1,8 @@
 package com.purwafest.purwafest.event.application.impl;
 
+import com.purwafest.purwafest.auth.domain.entities.User;
+import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
+import com.purwafest.purwafest.common.security.Claims;
 import com.purwafest.purwafest.event.application.EventTicketTypeServices;
 import com.purwafest.purwafest.event.application.TicketServices;
 import com.purwafest.purwafest.event.domain.entities.EventTicketType;
@@ -22,16 +25,21 @@ public class TicketServiceImpl implements TicketServices {
   private final TicketRepository ticketRepository;
   private final EventTicketTypeServices eventTicketTypeServices;
   private final EventTicketTypeRepository eventTicketTypeRepository;
+  private final UserRepository userRepository;
 
-  public TicketServiceImpl (TicketRepository ticketRepository, EventTicketTypeServices eventTicketTypeServices, EventTicketTypeRepository eventTicketTypeRepository) {
+  public TicketServiceImpl (TicketRepository ticketRepository, EventTicketTypeServices eventTicketTypeServices, EventTicketTypeRepository eventTicketTypeRepository, UserRepository userRepository) {
     this.ticketRepository = ticketRepository;
     this.eventTicketTypeServices = eventTicketTypeServices;
     this.eventTicketTypeRepository = eventTicketTypeRepository;
+    this.userRepository = userRepository;
   }
 
   @Override
   public void createTicket(Integer quantity, Integer ticketTypeID) {
+
     EventTicketType eventTicketType = eventTicketTypeRepository.findById(ticketTypeID).orElseThrow(() -> new RuntimeException("Ticket type not found!"));
+    User user = userRepository.findById(Claims.getUserId()).orElseThrow(() -> new RuntimeException("User not found!"));
+
     if (quantity > eventTicketType.getStock()) {
       throw new ArithmeticException("Ticket stock insufficient!");
     }
@@ -46,6 +54,7 @@ public class TicketServiceImpl implements TicketServices {
       Ticket ticket = new Ticket();
       ticket.setEventTicketType(eventTicketType);
       ticket.setStatus(TicketStatus.BOOKED);
+      ticket.setUser(user);
       ticketList.add(ticket);
       quantity--;
       createdTicket++;
@@ -65,5 +74,10 @@ public class TicketServiceImpl implements TicketServices {
       ticket.setModifiedAt(Instant.now());
     }
     return ticketRepository.saveAll(ticketList);
+  }
+
+  @Override
+  public List<Ticket> getTicketByUserID(Integer userID) {
+    return ticketRepository.findAllByUser_Id(userID);
   }
 }
