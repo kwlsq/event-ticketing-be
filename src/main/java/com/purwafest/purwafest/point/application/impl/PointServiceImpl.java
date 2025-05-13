@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -19,8 +20,10 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public Long getTotalPoints(Integer userId){
-        LocalDateTime now = LocalDateTime.now();
-        Instant nowInstant = now.toInstant(ZoneOffset.UTC);
-        return this.pointRepository.getTotalPointsByUserIdNotExpired(userId,nowInstant);
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        Instant startOfDayInstant = startOfDay.toInstant(ZoneOffset.UTC);
+
+        return this.pointRepository.getTotalPointsByUserIdNotExpired(userId, startOfDayInstant);
     }
 }
