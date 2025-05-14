@@ -121,6 +121,10 @@ public class UserServiceImpl implements UserService {
         pointRepository.save(point);
     }
 
+    private void handleDiscount(){
+
+    }
+
     @Override
     public User getUserByEmail(String email) {
         Optional<User> user = userRepository.findUserByEmail(email);
