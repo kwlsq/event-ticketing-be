@@ -30,7 +30,7 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final EventTicketTypeRepository eventTicketTypeRepository;
   private final TicketServices ticketServices;
 
-  public InvoiceServiceImpl (InvoiceRepository invoiceRepository, UserRepository userRepository, InvoiceItemsRepository invoiceItemsRepository, EventRepository eventRepository, EventTicketTypeRepository eventTicketTypeRepository, TicketServices ticketServices) {
+  public InvoiceServiceImpl(InvoiceRepository invoiceRepository, UserRepository userRepository, InvoiceItemsRepository invoiceItemsRepository, EventRepository eventRepository, EventTicketTypeRepository eventTicketTypeRepository, TicketServices ticketServices) {
     this.invoiceRepository = invoiceRepository;
     this.userRepository = userRepository;
     this.invoiceItemsRepository = invoiceItemsRepository;
@@ -54,31 +54,30 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 // Create invoice
     Invoice invoice = new Invoice();
+
+    Set<InvoiceItems> invoiceItemsSet = new HashSet<>();
+    invoiceItemRequests.forEach(invoiceItemRequest -> {
+
+      InvoiceItems invoiceItems = new InvoiceItems();
+      System.out.println(invoiceItems + " invoice");
+      Optional<EventTicketType> eventTicketTypeOptional = eventTicketTypeRepository.findById(invoiceItemRequest.getEventTicketTypeID());
+
+      if (eventTicketTypeOptional.isPresent()) {
+        invoiceItems.setEventTicketType(eventTicketTypeOptional.get());
+        invoiceItems.setQty(invoiceItemRequest.getQty());
+        invoiceItems.setInvoice(invoice);
+        invoiceItems.setSubtotal(getSubtotal(invoiceItemRequest.getQty(), eventTicketTypeOptional.get().getPrice()));
+        ticketServices.createTicket(invoiceItemRequest.getQty(), invoiceItemRequest.getEventTicketTypeID());
+        invoiceItemsSet.add(invoiceItems);
+        invoiceItemsRepository.save(invoiceItems);
+      }
+    });
+
+// save invoice information
     invoice.setUser(user.get());
     invoice.setEvent(event.get());
     invoice.setStatus(PaymentStatus.PAID);
     invoiceRepository.save(invoice);
-
-        Set<InvoiceItems> invoiceItemsSet = new HashSet<>();
-    System.out.println(invoiceItemRequests + " invoice test");
-        invoiceItemRequests.forEach(invoiceItemRequest -> {
-
-          InvoiceItems invoiceItems = new InvoiceItems();
-          System.out.println(invoiceItems + " invoice");
-          Optional<EventTicketType> eventTicketTypeOptional = eventTicketTypeRepository.findById(invoiceItemRequest.getEventTicketTypeID());
-
-          if (eventTicketTypeOptional.isPresent()) {
-            invoiceItems.setEventTicketType(eventTicketTypeOptional.get());
-            invoiceItems.setQty(invoiceItemRequest.getQty());
-            invoiceItems.setInvoice(invoice);
-            invoiceItems.setSubtotal(getSubtotal(invoiceItemRequest.getQty(), eventTicketTypeOptional.get().getPrice()));
-            ticketServices.createTicket(invoiceItemRequest.getQty(), invoiceItemRequest.getEventTicketTypeID());
-            invoiceItemsSet.add(invoiceItems);
-            invoiceItemsRepository.save(invoiceItems);
-          }
-        });
-
-// save invoice item list to invoice
     invoice.setInvoiceItems(invoiceItemsSet);
 
     return InvoiceResponse.toResponse(invoice);
@@ -90,6 +89,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     List<Invoice> invoiceList = invoiceRepository.findAllByUser_Id(userID);
 
+//    return all invoice in invoice response
     List<InvoiceResponse> responses = new ArrayList<>();
     invoiceList.forEach(invoice -> {
       responses.add(InvoiceResponse.toResponse(invoice));
@@ -99,7 +99,6 @@ public class InvoiceServiceImpl implements InvoiceService {
   }
 
   public BigInteger getSubtotal(Integer qty, BigInteger price) {
-    return  BigInteger.valueOf(qty).multiply(price);
+    return BigInteger.valueOf(qty).multiply(price);
   }
-
 }
