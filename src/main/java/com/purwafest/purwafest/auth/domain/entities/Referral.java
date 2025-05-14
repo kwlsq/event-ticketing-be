@@ -18,7 +18,7 @@ import java.time.Instant;
 public class Referral {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "referral_id_gen")
-    @SequenceGenerator(name="referral_id_gen",sequenceName = "referral_id_gen",allocationSize = 1)
+    @SequenceGenerator(name="referral_id_gen",sequenceName = "referral_id_seq",allocationSize = 1)
     @Column(name="id", nullable = false)
     private Integer id;
 
