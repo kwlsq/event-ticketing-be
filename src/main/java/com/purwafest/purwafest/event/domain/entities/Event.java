@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.purwafest.purwafest.auth.domain.entities.User;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
+import com.purwafest.purwafest.image.domain.entities.Image;
 import com.purwafest.purwafest.promotion.domain.entities.Promotion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -55,7 +56,6 @@ public class Event {
   @Column(name = "is_free", nullable = false)
   private boolean isEventFree;
 
-  @NotNull
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
   private EventStatus status;

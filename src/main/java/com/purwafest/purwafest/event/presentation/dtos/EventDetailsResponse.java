@@ -2,13 +2,12 @@ package com.purwafest.purwafest.event.presentation.dtos;
 
 import com.purwafest.purwafest.event.domain.entities.Event;
 import com.purwafest.purwafest.event.domain.entities.EventTicketType;
-import com.purwafest.purwafest.event.domain.entities.Image;
+import com.purwafest.purwafest.image.domain.entities.Image;
 import com.purwafest.purwafest.event.domain.entities.Review;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
