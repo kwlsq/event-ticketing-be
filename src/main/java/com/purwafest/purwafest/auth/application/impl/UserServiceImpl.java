@@ -13,12 +13,19 @@ import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
 import com.purwafest.purwafest.auth.presentation.dtos.ReferralRequest;
 import com.purwafest.purwafest.auth.presentation.dtos.RegisterRequest;
 import com.purwafest.purwafest.auth.presentation.dtos.UpdateProfileRequest;
+import com.purwafest.purwafest.point.domain.constants.PointConstants;
+import com.purwafest.purwafest.point.domain.entities.Point;
+import com.purwafest.purwafest.point.infrastructure.repository.PointRepository;
+import com.purwafest.purwafest.point.presentation.dtos.PointRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,12 +35,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ReferralRepository referralRepository;
+    private final PointRepository pointRepository;
 
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ReferralRepository referralRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ReferralRepository referralRepository, PointRepository pointRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.referralRepository = referralRepository;
+        this.pointRepository = pointRepository;
     }
 
     @Override
@@ -90,6 +99,9 @@ public class UserServiceImpl implements UserService {
                 if (!referrer.getId().equals(user.getId())) { // Ensure referrer and referee are not the same
                     Referral referralRequest = new ReferralRequest(referrer.getId(), user.getId()).toReferral(referrer, user);
                     referralRepository.save(referralRequest);
+
+                    // Handle point if using referral code
+                    handlePoints(referrer);
                 } else {
                     throw new IllegalArgumentException("A user cannot refer themselves.");
                 }
@@ -97,6 +109,20 @@ public class UserServiceImpl implements UserService {
                 throw new IllegalArgumentException("Referrer not found.");
             }
         }
+    }
+
+    private void handlePoints(User referrer){
+        Long amount = PointConstants.REFERRAL_POINT_VALUE;
+        Instant expiredAt = LocalDateTime.now()
+                .plusMonths(3)
+                .atZone(ZoneId.systemDefault())
+                .toInstant();
+        Point point = new PointRequest(referrer.getId(),amount,false,PointConstants.POINT_SOURCE, expiredAt).toPoint(referrer);
+        pointRepository.save(point);
+    }
+
+    private void handleDiscount(){
+
     }
 
     @Override

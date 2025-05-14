@@ -7,7 +7,10 @@ import com.purwafest.purwafest.event.domain.enums.PromotionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Filter;
+
+import java.time.Instant;
 import java.util.Set;
 
 @Setter
@@ -19,37 +22,40 @@ import java.util.Set;
 @Table(name = "promotion")
 @Filter(name = "deletedAtFilter", condition = "deleted_at is null")
 public class Promotion {
+
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "image_id_gen")
-  @SequenceGenerator(name = "image_id_gen", sequenceName = "image_id_seq", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "promotion_id_gen")
+  @SequenceGenerator(name = "promotion_id_gen", sequenceName = "promotion_id_seq", allocationSize = 1)
   @Column(name = "id", nullable = false)
   private Integer id;
 
   @NotNull
-  @Column(name = "name")
+  @Column(name = "name", nullable = false)
   private String name;
 
-  @NotNull
   @Column(name = "description")
   private String description;
 
   @NotNull
-  @Column(name = "type")
+  @Enumerated(EnumType.STRING)
+  @Column(name = "type", nullable = false)
   private PromotionType type;
 
   @NotNull
-  @Column(name = "value")
+  @Column(name = "value", nullable = false)
   private Integer value;
 
-  @NotNull
   @Column(name = "period")
   private Integer period;
 
-  @Column(name = "usage_count")
-  private Integer usageCount;
+  @Column(name = "max_usage")
+  private Integer maxUsage;
 
-  @Column(name = "is_referral_promotion")
-  private boolean isReferralPromotion;
+  @Column(name = "usage_count", nullable = false, columnDefinition = "int4 default 0")
+  private Integer usageCount = 0;
+
+  @Column(name = "is_referral_promotion", nullable = false, columnDefinition = "boolean default false")
+  private boolean isReferralPromotion = false;
 
   @OneToMany(mappedBy = "promotion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonManagedReference
@@ -59,4 +65,29 @@ public class Promotion {
   @JoinColumn(name = "event_id", referencedColumnName = "id")
   @JsonBackReference
   private Event event;
+
+  @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "timestamp default now()")
+  private Instant createdAt;
+
+  @Column(name = "modified_at", nullable = false, columnDefinition = "timestamp default now()")
+  private Instant modifiedAt;
+
+  @Column(name = "deleted_at")
+  private Instant deletedAt;
+
+  @PrePersist
+  public void prePersist() {
+    createdAt = Instant.now();
+    modifiedAt = Instant.now();
+  }
+
+  @PreUpdate
+  public void preUpdate() {
+    modifiedAt = Instant.now();
+  }
+
+  @PreRemove
+  public void preRemove() {
+    deletedAt = Instant.now();
+  }
 }
