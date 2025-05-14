@@ -71,4 +71,9 @@ public class EventRestController {
         : Sort.Direction.ASC;
     return Sort.Order.by(property).with(direction);
   }
+
+  @GetMapping("/admin")
+  public List<Event> getEvents() {
+    return eventServices.getEvents();
+  }
 }

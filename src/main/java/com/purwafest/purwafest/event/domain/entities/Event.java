@@ -55,7 +55,6 @@ public class Event {
   @Column(name = "is_free", nullable = false)
   private boolean isEventFree;
 
-  @NotNull
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
   private EventStatus status;
