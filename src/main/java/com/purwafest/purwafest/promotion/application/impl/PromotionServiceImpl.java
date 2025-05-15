@@ -22,7 +22,6 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     @Override
-    @Transactional
     public Promotion createPromotion(CreatePromotionRequest request) {
         Event event = null;
 

@@ -13,10 +13,15 @@ import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
 import com.purwafest.purwafest.auth.presentation.dtos.ReferralRequest;
 import com.purwafest.purwafest.auth.presentation.dtos.RegisterRequest;
 import com.purwafest.purwafest.auth.presentation.dtos.UpdateProfileRequest;
+import com.purwafest.purwafest.discount.domain.entities.Discount;
+import com.purwafest.purwafest.discount.infrastructure.repository.DiscountRepository;
 import com.purwafest.purwafest.point.domain.constants.PointConstants;
 import com.purwafest.purwafest.point.domain.entities.Point;
 import com.purwafest.purwafest.point.infrastructure.repository.PointRepository;
 import com.purwafest.purwafest.point.presentation.dtos.PointRequest;
+import com.purwafest.purwafest.promotion.domain.constants.PromotionConstants;
+import com.purwafest.purwafest.promotion.domain.entities.Promotion;
+import com.purwafest.purwafest.promotion.infrastructure.repository.PromotionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -36,13 +42,16 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ReferralRepository referralRepository;
     private final PointRepository pointRepository;
+    private final DiscountRepository discountRepository;
+    private final PromotionRepository promotionRepository;
 
-
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ReferralRepository referralRepository, PointRepository pointRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ReferralRepository referralRepository, PointRepository pointRepository, DiscountRepository discountRepository, PromotionRepository promotionRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.referralRepository = referralRepository;
         this.pointRepository = pointRepository;
+        this.discountRepository = discountRepository;
+        this.promotionRepository = promotionRepository;
     }
 
     @Override
@@ -102,6 +111,9 @@ public class UserServiceImpl implements UserService {
 
                     // Handle point if using referral code
                     handlePoints(referrer);
+
+                    // Handle discount if using referral code
+                    handleDiscount(user);
                 } else {
                     throw new IllegalArgumentException("A user cannot refer themselves.");
                 }
@@ -121,8 +133,20 @@ public class UserServiceImpl implements UserService {
         pointRepository.save(point);
     }
 
-    private void handleDiscount(){
+    private void handleDiscount(User user){
+        Promotion promotion = promotionRepository.findById(PromotionConstants.REFERRAL_PROMOTION_ID)
+                .orElseThrow(() -> new IllegalArgumentException("Referral promotion not found"));
 
+        UUID uid = UUID.randomUUID();
+
+        Discount discount = Discount.builder()
+                .promotion(promotion)
+                .isUsed(false)
+                .user(user)
+                .codeVoucher(uid)
+                .build();
+
+        discountRepository.save(discount);
     }
 
     @Override

@@ -1,7 +1,8 @@
-package com.purwafest.purwafest.promotion.domain.entities;
+package com.purwafest.purwafest.discount.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.purwafest.purwafest.auth.domain.entities.User;
+import com.purwafest.purwafest.promotion.domain.entities.Promotion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
