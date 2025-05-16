@@ -24,19 +24,15 @@ public class Image {
   @Column(name = "id", nullable = false)
   private Integer id;
 
-  @NotNull
   @Column(name = "url")
   private String url;
 
-  @NotNull
   @Column(name = "alt")
   private String alt;
 
-  @NotNull
   @Column(name = "order_image")
   private String orderImage;
 
-  @NotNull
   @Column(name = "is_thumbnail")
   private boolean isThumbnail;
 

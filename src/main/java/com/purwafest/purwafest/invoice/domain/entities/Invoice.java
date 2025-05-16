@@ -6,7 +6,6 @@ import com.purwafest.purwafest.auth.domain.entities.User;
 import com.purwafest.purwafest.event.domain.entities.Event;
 import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.invoice.domain.enums.PaymentStatus;
-import com.purwafest.purwafest.invoice.presentation.converter.PaymentStatusConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
