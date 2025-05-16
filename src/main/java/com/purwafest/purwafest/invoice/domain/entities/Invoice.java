@@ -1,11 +1,18 @@
 package com.purwafest.purwafest.invoice.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.purwafest.purwafest.auth.domain.entities.User;
+import com.purwafest.purwafest.event.domain.entities.Event;
+import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.invoice.domain.enums.PaymentStatus;
+import com.purwafest.purwafest.invoice.presentation.converter.PaymentStatusConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -26,35 +33,29 @@ public class Invoice {
   @Column(name = "id", nullable = false)
   private Integer id;
 
-  @NotNull
-  @Column(name = "status")
+  @Column(name = "status", columnDefinition = "payment_status")
+  @Enumerated(EnumType.STRING)
+  @JdbcType(PostgreSQLEnumJdbcType.class)
   private PaymentStatus status;
 
-  @NotNull
   @Column(name = "payment_method")
   private String paymentMethod;
 
-  @NotNull
   @Column(name = "payment_date")
   private Instant paymentDate;
 
-  @NotNull
   @Column(name = "amount")
   private BigInteger amount;
 
-  @NotNull
   @Column(name = "fees")
   private BigInteger fees;
 
-  @NotNull
   @Column(name = "final_amount")
   private BigInteger finalAmount;
 
-  @NotNull
   @Column(name = "row_amount_point_usage")
   private BigInteger rowAmountPointUsage;
 
-  @NotNull
   @Column(name = "value_point_usage")
   private BigInteger valuePointUsage;
 
@@ -70,6 +71,16 @@ public class Invoice {
   @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonManagedReference
   private Set<InvoiceItems> invoiceItems;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  @JsonBackReference
+  private User user;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "event_id", referencedColumnName = "id")
+  @JsonBackReference
+  private Event event;
 
   @PrePersist
   public void prePersist() {
