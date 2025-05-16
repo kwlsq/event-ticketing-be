@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
                         //  Allow public access to these endpoints
-                        .requestMatchers("/api/v1/auth/login", "/api/v1/user/register", "/","/api/v1/auth/refresh-token", "/api/v1/event").permitAll()
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/user/register/*","/api/v1/auth/refresh-token", "/api/v1/public/*").permitAll()
                         // Require authentication for all other endpoints
                         .anyRequest().authenticated()
                 )
