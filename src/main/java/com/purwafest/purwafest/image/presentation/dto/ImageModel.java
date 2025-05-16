@@ -11,4 +11,5 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageModel {
   private String name;
   private MultipartFile file;
+  private MultipartFile[] multipartFiles;
 }
