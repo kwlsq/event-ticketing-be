@@ -58,7 +58,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
+                .cors(cors -> cors.configurationSource(new CorsConfigurationImpl()))
                 .authorizeHttpRequests(auth -> auth
                         //  Allow public access to these endpoints
                         .requestMatchers("/api/v1/auth/login", "/api/v1/user/register/*","/api/v1/auth/refresh-token", "/api/v1/public/*").permitAll()
