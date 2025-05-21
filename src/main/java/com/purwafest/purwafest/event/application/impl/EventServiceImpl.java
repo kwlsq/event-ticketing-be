@@ -1,11 +1,15 @@
 package com.purwafest.purwafest.event.application.impl;
 
+import com.purwafest.purwafest.auth.domain.entities.User;
+import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
 import com.purwafest.purwafest.common.PaginatedResponse;
+import com.purwafest.purwafest.common.security.Claims;
 import com.purwafest.purwafest.event.application.EventServices;
 import com.purwafest.purwafest.event.domain.entities.Event;
 import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventRepository;
+import com.purwafest.purwafest.event.infrastructure.repositories.EventTicketTypeRepository;
 import com.purwafest.purwafest.event.infrastructure.repositories.specification.EventSpecification;
 import com.purwafest.purwafest.event.presentation.dtos.EventDetailsResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventListResponse;
@@ -16,18 +20,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class EventServiceImpl implements EventServices {
   private final EventRepository eventRepository;
+  private final UserRepository userRepository;
+  private final EventTicketTypeRepository eventTicketTypeRepository;
 
-  public EventServiceImpl (EventRepository eventRepository) {
+  public EventServiceImpl (EventRepository eventRepository, UserRepository userRepository, EventTicketTypeRepository eventTicketTypeRepository) {
     this.eventRepository = eventRepository;
+    this.userRepository = userRepository;
+    this.eventTicketTypeRepository = eventTicketTypeRepository;
   }
 
   @Override
@@ -62,8 +71,35 @@ public class EventServiceImpl implements EventServices {
 
   @Override
   public Event createEvent(EventRequest request) {
-    Event event = request.toEvent();
-    return eventRepository.save(event);
+    Integer userID = Claims.getUserId();
+    Optional<User> user = userRepository.findById(userID);
+
+    if (user.isPresent()) {
+//      Create event first to get eventID
+      Event event = request.toEvent();
+      event.setUser(user.get());
+      event.setStatus(EventStatus.UPCOMING);
+      eventRepository.save(event);
+
+//      Parse sell date to Instant data type
+      Instant sellDate = LocalDateTime.parse(
+              request.getTicketSaleDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+          )
+          .atZone(ZoneId.of("America/Toronto"))
+          .toInstant() ;
+
+      request.getTicketTypeRequest().forEach(eachEventTicketType -> {
+        EventTicketType eventTicketType = eachEventTicketType.toEventTicketType();
+        eventTicketType.setEvent(event);
+        eventTicketType.setSellDate(sellDate);
+        eventTicketTypeRepository.save(eventTicketType);
+      });
+
+//      Return created event
+      return event;
+    }
+
+    return null;
   }
 
   @Override

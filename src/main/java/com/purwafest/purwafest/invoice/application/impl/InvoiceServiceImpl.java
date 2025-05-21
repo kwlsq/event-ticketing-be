@@ -16,6 +16,7 @@ import com.purwafest.purwafest.invoice.infrastucture.repositories.InvoiceItemsRe
 import com.purwafest.purwafest.invoice.infrastucture.repositories.InvoiceRepository;
 import com.purwafest.purwafest.invoice.presentation.dto.InvoiceItemRequest;
 import com.purwafest.purwafest.invoice.presentation.dto.InvoiceResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -40,6 +41,7 @@ public class InvoiceServiceImpl implements InvoiceService {
   }
 
   @Override
+  @Transactional
   public InvoiceResponse createInvoice(Integer eventID, List<InvoiceItemRequest> invoiceItemRequests, Integer userID) {
     Optional<User> user = userRepository.findById(userID);
     Optional<Event> event = eventRepository.findById(eventID);
@@ -56,8 +58,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     Invoice invoice = new Invoice();
 
     Set<InvoiceItems> invoiceItemsSet = new HashSet<>();
-    invoiceItemRequests.forEach(invoiceItemRequest -> {
 
+    invoiceItemRequests.forEach(invoiceItemRequest -> {
       InvoiceItems invoiceItems = new InvoiceItems();
       System.out.println(invoiceItems + " invoice");
       Optional<EventTicketType> eventTicketTypeOptional = eventTicketTypeRepository.findById(invoiceItemRequest.getEventTicketTypeID());
@@ -67,8 +69,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceItems.setQty(invoiceItemRequest.getQty());
         invoiceItems.setInvoice(invoice);
         invoiceItems.setSubtotal(getSubtotal(invoiceItemRequest.getQty(), eventTicketTypeOptional.get().getPrice()));
-        ticketServices.createTicket(invoiceItemRequest.getQty(), invoiceItemRequest.getEventTicketTypeID());
+        invoiceItems.setInvoice(invoice);
         invoiceItemsSet.add(invoiceItems);
+        ticketServices.createTicket(invoiceItemRequest.getQty(), invoiceItemRequest.getEventTicketTypeID());
         invoiceItemsRepository.save(invoiceItems);
       }
     });
@@ -77,8 +80,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     invoice.setUser(user.get());
     invoice.setEvent(event.get());
     invoice.setStatus(PaymentStatus.PAID);
-    invoiceRepository.save(invoice);
     invoice.setInvoiceItems(invoiceItemsSet);
+    invoiceRepository.save(invoice);
 
     return InvoiceResponse.toResponse(invoice);
   }
