@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigInteger;
+import java.time.Instant;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChartData {
-    private String month;
-    private long value;
+    private BigInteger finalAmount;
+    private Instant paymentDate;
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -20,6 +21,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "event_ticket_type")
+@FilterDef(name = "deletedAtFilter")
 @Filter(name = "deletedAtFilter", condition = "deleted_at is null")
 public class EventTicketType {
   @Id
