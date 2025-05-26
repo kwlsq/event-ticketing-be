@@ -31,7 +31,7 @@ public class EventRestController {
     );
   }
 
-  @GetMapping
+  @GetMapping("/public")
   public ResponseEntity<?> getEventList(@RequestParam(value = "page", defaultValue = "0") int page,
                                         @RequestParam(value = "size", defaultValue = "10") int size,
                                         @RequestParam(value = "sort", defaultValue = "id") String sort,
@@ -44,7 +44,7 @@ public class EventRestController {
     );
   }
 
-  @GetMapping("/{eventID}")
+  @GetMapping("/public/{eventID}")
   public ResponseEntity<?> getCurrentEvent(@PathVariable Integer eventID) {
     return Response.successfulResponse(
         "Fetched event successfully!",
