@@ -31,7 +31,6 @@ public class Claims {
 
     public static Integer getUserId() {
         Map<String, Object> claims = getClaims();
-        System.out.println(claims.toString());
         return Integer.parseInt(String.valueOf(claims.get("sub")));
     }
 }

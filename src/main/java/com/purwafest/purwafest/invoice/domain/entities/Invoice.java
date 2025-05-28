@@ -53,7 +53,7 @@ public class Invoice {
   private BigInteger finalAmount;
 
   @Column(name = "row_amount_point_usage")
-  private BigInteger rowAmountPointUsage;
+  private Integer rowAmountPointUsage;
 
   @Column(name = "value_point_usage")
   private BigInteger valuePointUsage;
