@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Filter;
 
+import java.math.BigInteger;
 import java.time.Instant;
 
 @Getter
@@ -35,8 +36,8 @@ public class PointHistory {
     private Invoice invoice;
 
     @NotNull
-    @Column(name = "usage_count", nullable = false)
-    private Integer usageCount;
+    @Column(name = "amount_used", nullable = false)
+    private BigInteger amountUsed;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

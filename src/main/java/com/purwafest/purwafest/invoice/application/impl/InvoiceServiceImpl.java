@@ -18,6 +18,8 @@ import com.purwafest.purwafest.invoice.infrastucture.repositories.InvoiceReposit
 import com.purwafest.purwafest.invoice.presentation.dto.InvoiceItemRequest;
 import com.purwafest.purwafest.invoice.presentation.dto.InvoiceResponse;
 import com.purwafest.purwafest.point.domain.entities.Point;
+import com.purwafest.purwafest.point.domain.entities.PointHistory;
+import com.purwafest.purwafest.point.infrastructure.repository.PointHistoryRepository;
 import com.purwafest.purwafest.point.infrastructure.repository.PointRepository;
 import com.purwafest.purwafest.point.presentation.dtos.PointUsageSummary;
 import jakarta.transaction.Transactional;
@@ -36,8 +38,9 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final EventTicketTypeRepository eventTicketTypeRepository;
   private final TicketServices ticketServices;
   private final PointRepository pointRepository;
+  private final PointHistoryRepository pointHistoryRepository;
 
-  public InvoiceServiceImpl(InvoiceRepository invoiceRepository, UserRepository userRepository, InvoiceItemsRepository invoiceItemsRepository, EventRepository eventRepository, EventTicketTypeRepository eventTicketTypeRepository, TicketServices ticketServices, PointRepository pointRepository) {
+  public InvoiceServiceImpl(InvoiceRepository invoiceRepository, UserRepository userRepository, InvoiceItemsRepository invoiceItemsRepository, EventRepository eventRepository, EventTicketTypeRepository eventTicketTypeRepository, TicketServices ticketServices, PointRepository pointRepository, PointHistoryRepository pointHistoryRepository) {
     this.invoiceRepository = invoiceRepository;
     this.userRepository = userRepository;
     this.invoiceItemsRepository = invoiceItemsRepository;
@@ -45,6 +48,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     this.eventTicketTypeRepository = eventTicketTypeRepository;
     this.ticketServices = ticketServices;
     this.pointRepository = pointRepository;
+    this.pointHistoryRepository = pointHistoryRepository;
   }
 
   @Override
@@ -112,6 +116,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     invoice.setValuePointUsage(pointUsageSummary.getTotalUsedPoint());
     invoice.setRowAmountPointUsage(pointUsageSummary.getRowUsed());
     invoice.setFinalAmount(amount.subtract(pointUsageSummary.getTotalUsedPoint()));
+
+    // Step 5: Save to point_history table
+    PointHistory pointHistory = new PointHistory();
+    pointHistory.setUser(user.get());
+    pointHistory.setInvoice(invoice);
+    pointHistory.setAmountUsed(pointUsageSummary.getTotalUsedPoint());
+    pointHistoryRepository.save(pointHistory);
 
     return InvoiceResponse.toResponse(invoice);
   }
