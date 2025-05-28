@@ -48,6 +48,7 @@ public class TokenGeneratorServiceImpl implements TokenGeneratorService {
                 .expiresAt(expiresAt)
                 .subject(user.getId().toString())
                 .claim("email",user.getEmail())
+                .claim("name", user.getName())
                 .claim("scope", scopes)
                 .claim("kind", TokenType.ACCESS.getType())
                 .build();

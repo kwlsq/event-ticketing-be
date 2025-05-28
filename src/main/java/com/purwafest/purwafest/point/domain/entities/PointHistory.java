@@ -1,12 +1,14 @@
 package com.purwafest.purwafest.point.domain.entities;
 
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.purwafest.purwafest.auth.domain.entities.User;
+import com.purwafest.purwafest.invoice.domain.entities.Invoice;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Filter;
 
-import java.math.BigInteger;
 import java.time.Instant;
 
 @Getter
@@ -15,12 +17,12 @@ import java.time.Instant;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="point")
+@Table(name="point_history")
 @Filter(name = "deletedAtFilter", condition = "deleted_at is null")
-public class Point {
+public class PointHistory {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "point_id_gen")
-    @SequenceGenerator(name="point_id_gen",sequenceName = "point_id_seq",allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "point_history_id_gen")
+    @SequenceGenerator(name="point_history_id_gen",sequenceName = "point_history_id_seq",allocationSize = 1)
     @Column(name="id", nullable = false)
     private Integer id;
 
@@ -28,25 +30,13 @@ public class Point {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @NotNull
-    @Column(name = "amount", nullable = false)
-    private BigInteger amount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoice_id", referencedColumnName = "id")
+    private Invoice invoice;
 
     @NotNull
-    @Column(name = "amount_used", nullable = false)
-    private BigInteger amountUsed;
-
-    @NotNull
-    @Column(name = "is_redeemed", nullable = false)
-    private Boolean isRedeemed;
-
-    @NotNull
-    @Column(name = "point_resource", nullable = false)
-    private String pointResource;
-
-    @NotNull
-    @Column(name = "expired_at", nullable = false)
-    private Instant expiredAt;
+    @Column(name = "usage_count", nullable = false)
+    private Integer usageCount;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

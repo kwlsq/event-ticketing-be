@@ -8,6 +8,7 @@ import com.purwafest.purwafest.invoice.presentation.dto.InvoiceItemRequestWrappe
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @RestController
@@ -23,10 +24,11 @@ public class InvoiceRestController {
   @PostMapping("/{eventID}")
   public ResponseEntity<?> createInvoice (@RequestBody InvoiceItemRequestWrapper requests, @PathVariable Integer eventID) {
     List<InvoiceItemRequest> invoiceItemRequests = requests.getInvoiceItemRequests();
+    BigInteger points = requests.getPointAmount();
     Integer userID = Claims.getUserId();
     return Response.successfulResponse(
         "Successful to create invoice!",
-        invoiceService.createInvoice(eventID, invoiceItemRequests, userID)
+        invoiceService.createInvoice(eventID, invoiceItemRequests,points, userID)
     );
   }
 
