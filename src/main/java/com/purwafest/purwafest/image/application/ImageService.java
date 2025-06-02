@@ -8,6 +8,5 @@ import java.util.List;
 import java.util.Map;
 
 public interface ImageService {
-  ResponseEntity<Map> uploadImage(ImageModel imageModel);
-  ResponseEntity<Map> uploadMultiImage(ImageModel imageModel);
+  ResponseEntity<Map> uploadMultiImage(MultipartFile[] multipartFile, Integer eventID);
 }

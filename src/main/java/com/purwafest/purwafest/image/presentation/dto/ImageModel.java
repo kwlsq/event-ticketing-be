@@ -9,7 +9,5 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImageModel {
-  private String name;
-  private MultipartFile file;
   private MultipartFile[] multipartFiles;
 }

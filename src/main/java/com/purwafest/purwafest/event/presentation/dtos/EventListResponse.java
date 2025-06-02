@@ -22,6 +22,7 @@ public class EventListResponse {
   private String location;
   private boolean isEventFree;
   private BigInteger startingPrice;
+  private String thumbnailUrl;
 
   public static EventListResponse toResponse(Event event) {
     EventListResponse eventListRequest = new EventListResponse();
@@ -32,6 +33,12 @@ public class EventListResponse {
     eventListRequest.location = event.getLocation();
     eventListRequest.isEventFree = event.isEventFree();
     eventListRequest.startingPrice = getStartingPrice(event);
+
+    event.getImages().forEach(image -> {
+      if (image.isThumbnail()) {
+        eventListRequest.thumbnailUrl = image.getUrl();
+      }
+    });
 
     return eventListRequest;
   }

@@ -33,14 +33,14 @@ public class EventRequest {
   private String ticketSaleDate;
 
   public Event toEvent() {
+
+    Instant instant = Instant.parse(date);
+    LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("America/Toronto"));
+
     return Event.builder()
         .name(name)
         .description(description)
-        .date(LocalDateTime.parse(
-            date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
-        )
-            .atZone(ZoneId.of("America/Toronto"))
-            .toInstant())
+        .date(localDateTime.atZone(ZoneId.of("America/Toronto")).toInstant())
         .location(location)
         .venue(venue)
         .isEventFree(isEventFree)
