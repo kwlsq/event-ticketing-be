@@ -16,10 +16,7 @@ public class EventSpecification{
       return cb.or(
           cb.like(cb.lower(root.get("name")), "%" + keyword.toLowerCase() + "%"),
           cb.like(cb.lower(root.get("description")), "%" + keyword.toLowerCase() + "%"),
-          cb.like(cb.lower(root.get("date")), "%" + keyword.toLowerCase() + "%"),
-          cb.like(cb.lower(root.get("location")), "%" + keyword.toLowerCase() + "%"),
-          cb.like(cb.lower(root.get("is_free")), "%" + keyword.toLowerCase() + "%"),
-          cb.like(cb.lower(root.get("status")), "%" + keyword.toLowerCase() + "%")
+          cb.like(cb.lower(root.get("location")), "%" + keyword.toLowerCase() + "%")
       );
     };
   }

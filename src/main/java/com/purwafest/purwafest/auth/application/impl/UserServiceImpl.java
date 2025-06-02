@@ -28,6 +28,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -124,12 +125,12 @@ public class UserServiceImpl implements UserService {
     }
 
     private void handlePoints(User referrer){
-        Long amount = PointConstants.REFERRAL_POINT_VALUE;
+        BigInteger amount = PointConstants.REFERRAL_POINT_VALUE;
         Instant expiredAt = LocalDateTime.now()
                 .plusMonths(3)
                 .atZone(ZoneId.systemDefault())
                 .toInstant();
-        Point point = new PointRequest(referrer.getId(),amount,false,PointConstants.POINT_SOURCE, expiredAt).toPoint(referrer);
+        Point point = new PointRequest(referrer.getId(), amount,false,PointConstants.POINT_SOURCE, expiredAt).toPoint(referrer);
         pointRepository.save(point);
     }
 

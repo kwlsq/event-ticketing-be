@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigInteger;
 import java.time.Instant;
 
 @Data
@@ -14,7 +15,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class PointRequest {
     private Integer userId;
-    private Long amount;
+    private BigInteger amount;
     private Boolean isRedeemed;
     private String pointResource;
     private Instant expiredAt;
