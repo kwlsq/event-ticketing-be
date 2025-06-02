@@ -1,6 +1,7 @@
 package com.purwafest.purwafest.event.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.purwafest.purwafest.invoice.domain.entities.InvoiceItems;
@@ -46,6 +47,7 @@ public class EventTicketType {
   private Integer availableQty;
 
   @Column(name = "sell_date")
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
   private Instant sellDate;
 
   @ManyToOne(fetch = FetchType.LAZY)

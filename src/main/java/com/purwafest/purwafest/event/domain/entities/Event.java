@@ -41,7 +41,7 @@ public class Event {
   private String description;
 
   @Column(name = "date")
-  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
   private Instant date;
 
   @NotNull

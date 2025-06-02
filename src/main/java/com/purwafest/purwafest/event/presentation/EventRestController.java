@@ -35,12 +35,13 @@ public class EventRestController {
   public ResponseEntity<?> getEventList(@RequestParam(value = "page", defaultValue = "0") int page,
                                         @RequestParam(value = "size", defaultValue = "10") int size,
                                         @RequestParam(value = "sort", defaultValue = "id") String sort,
-                                        @RequestParam(value = "search", defaultValue = "") String search) {
+                                        @RequestParam(value = "search", defaultValue = "") String search,
+                                        @RequestParam(value = "location", defaultValue = "") String location) {
     Pageable pageable = PageRequest.of(page, size, Sort.by(getSortOrder(sort)));
 
     return Response.successfulResponse(
         "Event fetched successfully!",
-        eventServices.getAllEvent(pageable, search)
+        eventServices.getAllEvent(pageable, search, location)
     );
   }
 

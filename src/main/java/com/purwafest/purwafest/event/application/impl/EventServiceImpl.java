@@ -40,9 +40,9 @@ public class EventServiceImpl implements EventServices {
   }
 
   @Override
-  public PaginatedResponse<EventListResponse> getAllEvent(Pageable pageable, String search) {
+  public PaginatedResponse<EventListResponse> getAllEvent(Pageable pageable, String search, String location) {
 
-    Page<Event> data = eventRepository.findAll(EventSpecification.getFilteredEvent(search), pageable).map(event -> event);
+    Page<Event> data = eventRepository.findAll(EventSpecification.getFilteredEvent(search, location), pageable).map(event -> event);
 
     List<EventListResponse> eventListResponses = new ArrayList<>();
 
@@ -82,11 +82,7 @@ public class EventServiceImpl implements EventServices {
       eventRepository.save(event);
 
 //      Parse sell date to Instant data type
-      Instant sellDate = LocalDateTime.parse(
-              request.getTicketSaleDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
-          )
-          .atZone(ZoneId.of("America/Toronto"))
-          .toInstant() ;
+      Instant sellDate = Instant.parse(request.getTicketSaleDate());
 
       request.getTicketTypeRequest().forEach(eachEventTicketType -> {
         EventTicketType eventTicketType = eachEventTicketType.toEventTicketType();
