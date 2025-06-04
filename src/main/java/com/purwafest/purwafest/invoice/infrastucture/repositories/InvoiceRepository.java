@@ -25,7 +25,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
           "FROM Invoice i " +
           "WHERE i.event.user.id = :userId " +
           "AND i.status = 'PAID' " +
-          "AND i.paymentDate BETWEEN :startDate AND :endDate")
+          "AND i.paymentDate BETWEEN :startDate AND :endDate " +
+          "ORDER BY i.paymentDate ASC")
   List<ChartData> findInvoicesByUserAndDateRange(
           @Param("userId") Integer userId,
           @Param("startDate") Instant startDate,
