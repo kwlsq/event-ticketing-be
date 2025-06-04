@@ -17,13 +17,13 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
   @Query("SELECT i FROM Invoice i WHERE i.user.id = :userId AND i.deletedAt IS NULL")
   List<Invoice> findAllByUser_Id(Integer userId);
 
-  @Query("SELECT SUM(i.finalAmount) FROM Invoice i WHERE i.user.id = :userId")
-  Long sumFinalAmountByUserId(@Param("userId") Integer userId);
+  @Query("SELECT SUM(i.amount) FROM Invoice i WHERE i.event.user.id = :userId")
+  Long sumAmountByOrganizerId(@Param("organizerId") Integer userId);
 
   @Query("SELECT new com.purwafest.purwafest.dashboard.presentation.dtos.ChartData(" +
           "i.finalAmount, i.paymentDate) " +
           "FROM Invoice i " +
-          "WHERE i.user.id = :userId " +
+          "WHERE i.event.user.id = :userId " +
           "AND i.status = 'PAID' " +
           "AND i.paymentDate BETWEEN :startDate AND :endDate")
   List<ChartData> findInvoicesByUserAndDateRange(
