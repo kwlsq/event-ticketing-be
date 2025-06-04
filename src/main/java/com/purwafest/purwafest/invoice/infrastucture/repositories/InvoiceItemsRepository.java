@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InvoiceItemsRepository extends JpaRepository<InvoiceItems, Integer> {
-    @Query("SELECT COALESCE(SUM(ii.qty), 0) FROM InvoiceItems ii WHERE ii.invoice.user.id = :userId")
+    @Query("SELECT COALESCE(SUM(ii.qty), 0) FROM InvoiceItems ii WHERE ii.invoice.event.user.id = :userId")
     Integer countByUserId(@Param("userId") Integer userId);
 }
