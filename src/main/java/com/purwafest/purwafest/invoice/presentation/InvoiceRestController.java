@@ -25,10 +25,11 @@ public class InvoiceRestController {
   public ResponseEntity<?> createInvoice (@RequestBody InvoiceItemRequestWrapper requests, @PathVariable Integer eventID) {
     List<InvoiceItemRequest> invoiceItemRequests = requests.getInvoiceItemRequests();
     BigInteger points = requests.getPointAmount();
+    Integer discountID = requests.getDiscountID();
     Integer userID = Claims.getUserId();
     return Response.successfulResponse(
         "Successful to create invoice!",
-        invoiceService.createInvoice(eventID, invoiceItemRequests,points, userID)
+        invoiceService.createInvoice(eventID, invoiceItemRequests,points, userID, discountID)
     );
   }
 

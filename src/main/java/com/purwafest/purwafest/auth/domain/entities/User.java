@@ -58,12 +58,6 @@ public class User {
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
-//   one ticket one user
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<Ticket> tickets;
-
-//   one user many invoice
-
     @OneToMany(mappedBy = "referrer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Referral> referredUsers;
 

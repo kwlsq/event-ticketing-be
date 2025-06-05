@@ -3,6 +3,8 @@ package com.purwafest.purwafest.invoice.application.impl;
 import com.purwafest.purwafest.auth.domain.entities.User;
 import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
 import com.purwafest.purwafest.common.security.Claims;
+import com.purwafest.purwafest.discount.domain.entities.Discount;
+import com.purwafest.purwafest.discount.infrastructure.repository.DiscountRepository;
 import com.purwafest.purwafest.event.application.TicketServices;
 import com.purwafest.purwafest.event.domain.entities.Event;
 import com.purwafest.purwafest.event.domain.entities.EventTicketType;
@@ -39,8 +41,9 @@ public class InvoiceServiceImpl implements InvoiceService {
   private final TicketServices ticketServices;
   private final PointRepository pointRepository;
   private final PointHistoryRepository pointHistoryRepository;
+  private final DiscountRepository discountRepository;
 
-  public InvoiceServiceImpl(InvoiceRepository invoiceRepository, UserRepository userRepository, InvoiceItemsRepository invoiceItemsRepository, EventRepository eventRepository, EventTicketTypeRepository eventTicketTypeRepository, TicketServices ticketServices, PointRepository pointRepository, PointHistoryRepository pointHistoryRepository) {
+  public InvoiceServiceImpl(InvoiceRepository invoiceRepository, UserRepository userRepository, InvoiceItemsRepository invoiceItemsRepository, EventRepository eventRepository, EventTicketTypeRepository eventTicketTypeRepository, TicketServices ticketServices, PointRepository pointRepository, PointHistoryRepository pointHistoryRepository, DiscountRepository discountRepository) {
     this.invoiceRepository = invoiceRepository;
     this.userRepository = userRepository;
     this.invoiceItemsRepository = invoiceItemsRepository;
@@ -49,13 +52,16 @@ public class InvoiceServiceImpl implements InvoiceService {
     this.ticketServices = ticketServices;
     this.pointRepository = pointRepository;
     this.pointHistoryRepository = pointHistoryRepository;
+    this.discountRepository = discountRepository;
   }
 
   @Override
   @Transactional
-  public InvoiceResponse createInvoice(Integer eventID, List<InvoiceItemRequest> invoiceItemRequests, BigInteger points, Integer userID) {
+  public InvoiceResponse createInvoice(Integer eventID, List<InvoiceItemRequest> invoiceItemRequests, BigInteger points, Integer userID, Integer discountID) {
     Optional<User> user = userRepository.findById(userID);
     Optional<Event> event = eventRepository.findById(eventID);
+    Optional<Discount> discount = discountRepository.findById(discountID);
+
 
     if (user.isEmpty()) {
       throw new IllegalArgumentException("User not found!");
@@ -63,6 +69,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     if (event.isEmpty()) {
       throw new IllegalArgumentException("Event not found!");
+    }
+
+    if (discount.isEmpty()) {
+      throw new IllegalArgumentException("Discount not found!");
     }
 
     // Step 1: create and save invoice to DB
@@ -74,6 +84,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     invoice.setPaymentDate(Instant.now());
     invoice.setFees(InvoiceConstants.PAYMENT_FEE);
     invoice.setPaymentMethod(InvoiceConstants.PAYMENT_METHOD);
+    invoice.setDiscount(discount.get());
     invoice = invoiceRepository.save(invoice); // save invoice first before invoice items
 
     Set<InvoiceItems> invoiceItemsSet = new HashSet<>();
