@@ -14,31 +14,30 @@ import com.purwafest.purwafest.event.infrastructure.repositories.specification.E
 import com.purwafest.purwafest.event.presentation.dtos.EventDetailsResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventListResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventRequest;
+import com.purwafest.purwafest.promotion.domain.entities.Promotion;
+import com.purwafest.purwafest.promotion.infrastructure.repository.PromotionRepository;
+import com.purwafest.purwafest.promotion.presentation.dtos.PromotionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class EventServiceImpl implements EventServices {
   private final EventRepository eventRepository;
   private final UserRepository userRepository;
   private final EventTicketTypeRepository eventTicketTypeRepository;
+  private final PromotionRepository promotionRepository;
 
-  public EventServiceImpl (EventRepository eventRepository, UserRepository userRepository, EventTicketTypeRepository eventTicketTypeRepository) {
+  public EventServiceImpl (EventRepository eventRepository, UserRepository userRepository, EventTicketTypeRepository eventTicketTypeRepository, PromotionRepository promotionRepository) {
     this.eventRepository = eventRepository;
     this.userRepository = userRepository;
     this.eventTicketTypeRepository = eventTicketTypeRepository;
+    this.promotionRepository = promotionRepository;
   }
 
   @Override
@@ -142,7 +141,17 @@ public class EventServiceImpl implements EventServices {
   @Override
   public EventDetailsResponse getCurrentEvent(Integer eventID) {
     Event event = eventRepository.findById(eventID).orElseThrow(() -> new RuntimeException("Event not found!"));
-    return EventDetailsResponse.toResponse(event);
+    return EventDetailsResponse.toResponse(event,getPromotions(eventID));
+  }
+
+  private List<PromotionResponse> getPromotions(Integer eventId){
+    List<Promotion> promotions = promotionRepository.findValidPromotions(eventId);
+    List<PromotionResponse> promotionResponses = new ArrayList<>();
+    promotions.forEach(promotion -> {
+      PromotionResponse response = PromotionResponse.toResponse(promotion);
+      promotionResponses.add(response);
+    });
+    return promotionResponses;
   }
 
   @Override
