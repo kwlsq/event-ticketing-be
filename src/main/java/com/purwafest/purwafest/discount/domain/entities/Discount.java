@@ -1,7 +1,9 @@
 package com.purwafest.purwafest.discount.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.purwafest.purwafest.auth.domain.entities.User;
+import com.purwafest.purwafest.invoice.domain.entities.Invoice;
 import com.purwafest.purwafest.promotion.domain.entities.Promotion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +11,7 @@ import lombok.*;
 import org.hibernate.annotations.Filter;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @Setter
@@ -43,6 +46,9 @@ public class Discount {
   @JoinColumn(name = "promotion_id", referencedColumnName = "id")
   @JsonBackReference
   private Promotion promotion;
+
+  @OneToMany(mappedBy = "discount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private Set<Invoice> invoice;
 
   @Column(name = "created_at")
   private Instant createdAt;

@@ -3,6 +3,7 @@ package com.purwafest.purwafest.invoice.domain.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.purwafest.purwafest.auth.domain.entities.User;
+import com.purwafest.purwafest.discount.domain.entities.Discount;
 import com.purwafest.purwafest.event.domain.entities.Event;
 import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.invoice.domain.enums.PaymentStatus;
@@ -80,6 +81,11 @@ public class Invoice {
   @JoinColumn(name = "event_id", referencedColumnName = "id")
   @JsonBackReference
   private Event event;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "voucher_id", referencedColumnName = "id")
+  @JsonBackReference
+  private Discount discount;
 
   @PrePersist
   public void prePersist() {

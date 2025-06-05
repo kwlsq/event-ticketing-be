@@ -8,6 +8,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 public interface InvoiceService {
-  InvoiceResponse createInvoice(Integer eventID, List<InvoiceItemRequest> invoiceItemRequests, BigInteger points, Integer userID);
+  InvoiceResponse createInvoice(Integer eventID, List<InvoiceItemRequest> invoiceItemRequests, BigInteger points, Integer userID, Integer discountID);
   List<InvoiceResponse> getAllInvoice();
 }
