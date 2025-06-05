@@ -42,7 +42,7 @@ public class ImageServiceImpl implements ImageService {
         Image image = new Image();
         image.setUrl(cloudinaryService.uploadFile(file, "purwafest_event"));
         image.setEvent(eventOptional.get());
-        image.setAlt("Image " + (i + 1) + "of " + eventOptional.get());
+        image.setAlt("Image " + (i + 1) + " of " + eventOptional.get().getName());
         image.setOrderImage(Integer.toString(i + 1));
 
 //        Set the thumbnail only from first image

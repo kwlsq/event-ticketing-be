@@ -19,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -46,9 +48,17 @@ public class EventServiceImpl implements EventServices {
 
     List<EventListResponse> eventListResponses = new ArrayList<>();
 
+    List<Integer> eventIDs = new ArrayList<>();
+
     data.getContent().forEach(event -> {
       EventListResponse response = EventListResponse.toResponse(event);
       eventListResponses.add(response);
+      eventIDs.add(event.getId());
+    });
+
+    Map<Integer, BigInteger> finalMinTicketPriceMap = eventTicketTypeRepository.getMinimumPriceMap(eventIDs);
+    eventListResponses.forEach(eventListResponse -> {
+      eventListResponse.setStartingPrice(finalMinTicketPriceMap.get(eventListResponse.getId()));
     });
 
     return getEventListResponsePaginatedResponse(pageable, data, eventListResponses);

@@ -3,21 +3,30 @@ package com.purwafest.purwafest.event.infrastructure.repositories.specification;
 import com.purwafest.purwafest.event.domain.entities.Event;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 
 public class EventSpecification{
   public static Specification<Event> searchByKeyword(String keyword, String location) {
     return (Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
-      if (keyword == null || keyword.isEmpty()) {
-        return cb.conjunction();
+
+      Predicate keywordPredicate = cb.conjunction();
+
+      if (keyword != null && !keyword.isEmpty()) {
+        keywordPredicate = cb.or(
+            cb.like(cb.lower(root.get("name")), "%" + keyword.toLowerCase() + "%"),
+            cb.like(cb.lower(root.get("description")), "%" + keyword.toLowerCase() + "%")
+        );
       }
 
-      return cb.or(
-          cb.like(cb.lower(root.get("name")), "%" + keyword.toLowerCase() + "%"),
-          cb.like(cb.lower(root.get("description")), "%" + keyword.toLowerCase() + "%"),
-          cb.like(cb.lower(root.get("location")), "%" + location.toLowerCase() + "%")
-      );
+//      If location is passed, filter by location and keyword
+      if (location != null && !location.isEmpty()) {
+        Predicate locationPredicate = cb.like(cb.lower(root.get("location")), "%" + location.toLowerCase() + "%");
+        return cb.and(keywordPredicate, locationPredicate);
+      }
+
+      return keywordPredicate;
     };
   }
 
