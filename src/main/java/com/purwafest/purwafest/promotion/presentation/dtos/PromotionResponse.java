@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PromotionResponse {
+    private Integer id;
     private String name;
     private String description;
     private PromotionType type;
@@ -20,6 +21,7 @@ public class PromotionResponse {
 
     public static PromotionResponse toResponse(Promotion promotion) {
         PromotionResponse promotionRequest = new PromotionResponse();
+        promotionRequest.id = promotion.getId();
         promotionRequest.name = promotion.getName();
         promotionRequest.description = promotion.getDescription();
         promotionRequest.type = promotion.getType();
