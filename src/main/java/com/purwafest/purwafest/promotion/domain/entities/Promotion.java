@@ -11,6 +11,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Filter;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Set;
 
@@ -44,7 +45,7 @@ public class Promotion {
 
   @NotNull
   @Column(name = "value", nullable = false)
-  private Integer value;
+  private BigDecimal value;
 
   @Column(name = "period")
   private Integer period;
@@ -66,6 +67,9 @@ public class Promotion {
   @JoinColumn(name = "event_id", referencedColumnName = "id")
   @JsonBackReference
   private Event event;
+
+  @Column(name = "expired_date")
+  private Instant expiredDate;
 
   @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "timestamp default now()")
   private Instant createdAt;

@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,7 +17,7 @@ public class CreatePromotionRequest {
     private String name;
     private String description;
     private PromotionType type;
-    private Integer value;
+    private BigDecimal value;
     private Integer period;
     private Integer maxUsage;
     private Integer usageCount;
