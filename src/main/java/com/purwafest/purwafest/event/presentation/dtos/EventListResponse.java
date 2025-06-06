@@ -29,13 +29,6 @@ public class EventListResponse {
     eventListRequest.venue = event.getVenue();
     eventListRequest.location = event.getLocation();
     eventListRequest.isEventFree = event.isEventFree();
-
-    event.getImages().forEach(image -> {
-      if (image.isThumbnail()) {
-        eventListRequest.thumbnailUrl = image.getUrl();
-      }
-    });
-
     return eventListRequest;
   }
 }

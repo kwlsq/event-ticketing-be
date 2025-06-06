@@ -14,6 +14,7 @@ import com.purwafest.purwafest.event.infrastructure.repositories.specification.E
 import com.purwafest.purwafest.event.presentation.dtos.EventDetailsResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventListResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventRequest;
+import com.purwafest.purwafest.image.infrastucture.repositories.ImageRepository;
 import com.purwafest.purwafest.promotion.domain.entities.Promotion;
 import com.purwafest.purwafest.promotion.infrastructure.repository.PromotionRepository;
 import com.purwafest.purwafest.promotion.presentation.dtos.PromotionResponse;
@@ -32,12 +33,14 @@ public class EventServiceImpl implements EventServices {
   private final UserRepository userRepository;
   private final EventTicketTypeRepository eventTicketTypeRepository;
   private final PromotionRepository promotionRepository;
+  private final ImageRepository imageRepository;
 
-  public EventServiceImpl (EventRepository eventRepository, UserRepository userRepository, EventTicketTypeRepository eventTicketTypeRepository, PromotionRepository promotionRepository) {
+  public EventServiceImpl (EventRepository eventRepository, UserRepository userRepository, EventTicketTypeRepository eventTicketTypeRepository, PromotionRepository promotionRepository, ImageRepository imageRepository) {
     this.eventRepository = eventRepository;
     this.userRepository = userRepository;
     this.eventTicketTypeRepository = eventTicketTypeRepository;
     this.promotionRepository = promotionRepository;
+    this.imageRepository = imageRepository;
   }
 
   @Override
@@ -56,8 +59,11 @@ public class EventServiceImpl implements EventServices {
     });
 
     Map<Integer, BigInteger> finalMinTicketPriceMap = eventTicketTypeRepository.getMinimumPriceMap(eventIDs);
+    Map<Integer, String> finalThumbnailImage = imageRepository.getThumbnailImage(eventIDs);
+
     eventListResponses.forEach(eventListResponse -> {
       eventListResponse.setStartingPrice(finalMinTicketPriceMap.get(eventListResponse.getId()));
+      eventListResponse.setThumbnailUrl(finalThumbnailImage.get(eventListResponse.getId()));
     });
 
     return getEventListResponsePaginatedResponse(pageable, data, eventListResponses);
