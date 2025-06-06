@@ -13,6 +13,7 @@ import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
 import com.purwafest.purwafest.auth.presentation.dtos.ReferralRequest;
 import com.purwafest.purwafest.auth.presentation.dtos.RegisterRequest;
 import com.purwafest.purwafest.auth.presentation.dtos.UpdateProfileRequest;
+import com.purwafest.purwafest.auth.presentation.dtos.UserResponse;
 import com.purwafest.purwafest.discount.domain.entities.Discount;
 import com.purwafest.purwafest.discount.infrastructure.repository.DiscountRepository;
 import com.purwafest.purwafest.point.domain.constants.PointConstants;
@@ -188,6 +189,16 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new UserNotFoundException("User not found");
         }
+    }
+
+    @Override
+    public UserResponse getUserProfileResponse(Integer id) {
+        User foundUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        foundUser.setPassword(null); // Don't send password to the client
+
+        return UserResponse.toResponse(foundUser);
     }
 
     @Override
