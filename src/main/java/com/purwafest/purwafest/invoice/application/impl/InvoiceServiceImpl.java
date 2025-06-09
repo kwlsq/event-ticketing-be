@@ -2,6 +2,7 @@ package com.purwafest.purwafest.invoice.application.impl;
 
 import com.purwafest.purwafest.auth.domain.entities.User;
 import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
+import com.purwafest.purwafest.common.PaginatedResponse;
 import com.purwafest.purwafest.common.security.Claims;
 import com.purwafest.purwafest.discount.domain.entities.Discount;
 import com.purwafest.purwafest.discount.infrastructure.repository.DiscountRepository;
@@ -10,6 +11,7 @@ import com.purwafest.purwafest.event.domain.entities.Event;
 import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventRepository;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventTicketTypeRepository;
+import com.purwafest.purwafest.event.presentation.dtos.EventListResponse;
 import com.purwafest.purwafest.invoice.application.InvoiceService;
 import com.purwafest.purwafest.invoice.domain.contants.InvoiceConstants;
 import com.purwafest.purwafest.invoice.domain.entities.Invoice;
@@ -25,6 +27,8 @@ import com.purwafest.purwafest.point.infrastructure.repository.PointHistoryRepos
 import com.purwafest.purwafest.point.infrastructure.repository.PointRepository;
 import com.purwafest.purwafest.point.presentation.dtos.PointUsageSummary;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -62,6 +66,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     Optional<Event> event = eventRepository.findById(eventID);
     Optional<Discount> discount = discountRepository.findById(discountID);
 
+//    Check if user use promotion or point
+    if (!(discountID == 0)) {
+      if (discount.isEmpty()) {
+        throw new IllegalArgumentException("Discount not found!");
+      }
+    }
 
     if (user.isEmpty()) {
       throw new IllegalArgumentException("User not found!");
@@ -69,10 +79,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     if (event.isEmpty()) {
       throw new IllegalArgumentException("Event not found!");
-    }
-
-    if (discount.isEmpty()) {
-      throw new IllegalArgumentException("Discount not found!");
     }
 
     // Step 1: create and save invoice to DB
@@ -84,13 +90,17 @@ public class InvoiceServiceImpl implements InvoiceService {
     invoice.setPaymentDate(Instant.now());
     invoice.setFees(InvoiceConstants.PAYMENT_FEE);
     invoice.setPaymentMethod(InvoiceConstants.PAYMENT_METHOD);
-    invoice.setDiscount(discount.get());
+
+    if (!(discountID == 0)) {
+      invoice.setDiscount(discount.get());
+    }
+
     invoice = invoiceRepository.save(invoice); // save invoice first before invoice items
 
     Set<InvoiceItems> invoiceItemsSet = new HashSet<>();
     BigInteger amount = BigInteger.ZERO;
 
-    // Step 2: create and save invoice items
+    // Step 2: created and save invoice items
     for (InvoiceItemRequest invoiceItemRequest : invoiceItemRequests) {
       InvoiceItems invoiceItems = new InvoiceItems();
       Optional<EventTicketType> eventTicketTypeOptional = eventTicketTypeRepository.findById(invoiceItemRequest.getEventTicketTypeID());
@@ -122,40 +132,56 @@ public class InvoiceServiceImpl implements InvoiceService {
     invoice = invoiceRepository.save(invoice);
 
     // Step 4: Handle point usage
-    PointUsageSummary pointUsageSummary = handlePoints(amount, points, userID);
+    if (!points.equals(BigInteger.ZERO)) {
+      PointUsageSummary pointUsageSummary = handlePoints(amount, points, userID);
 
-    invoice.setValuePointUsage(pointUsageSummary.getTotalUsedPoint());
-    invoice.setRowAmountPointUsage(pointUsageSummary.getRowUsed());
-    invoice.setFinalAmount(amount.subtract(pointUsageSummary.getTotalUsedPoint()));
+      invoice.setValuePointUsage(pointUsageSummary.getTotalUsedPoint());
+      invoice.setRowAmountPointUsage(pointUsageSummary.getRowUsed());
+      invoice.setFinalAmount(amount.subtract(pointUsageSummary.getTotalUsedPoint()));
 
-    // Step 5: Save to point_history table
-    PointHistory pointHistory = new PointHistory();
-    pointHistory.setUser(user.get());
-    pointHistory.setInvoice(invoice);
-    pointHistory.setAmountUsed(pointUsageSummary.getTotalUsedPoint());
-    pointHistoryRepository.save(pointHistory);
+      // Step 5: Save to point_history table
+      PointHistory pointHistory = new PointHistory();
+      pointHistory.setUser(user.get());
+      pointHistory.setInvoice(invoice);
+      pointHistory.setAmountUsed(pointUsageSummary.getTotalUsedPoint());
+      pointHistoryRepository.save(pointHistory);
+    }
 
     return InvoiceResponse.toResponse(invoice);
   }
 
   @Override
-  public List<InvoiceResponse> getAllInvoice() {
+  public PaginatedResponse<InvoiceResponse> getAllInvoice(Pageable pageable) {
     Integer userID = Claims.getUserId();
 
-    List<Invoice> invoiceList = invoiceRepository.findAllByUser_Id(userID);
+    Page<Invoice> invoicePage = invoiceRepository.findAllByUser_Id(userID, pageable).map(invoice -> invoice);
 
     // return all invoice in invoice response
     List<InvoiceResponse> responses = new ArrayList<>();
-    invoiceList.forEach(invoice -> {
-      responses.add(InvoiceResponse.toResponse(invoice));
+
+    invoicePage.getContent().forEach(invoice -> {
+      InvoiceResponse response = InvoiceResponse.toResponse(invoice);
+      responses.add(response);
     });
 
-    return responses;
+    return getInvoiceResponsePaginatedResponse(pageable, invoicePage, responses);
   }
 
-  public BigInteger getSubtotal(Integer qty, BigInteger price) {
-    return BigInteger.valueOf(qty).multiply(price);
+  private static PaginatedResponse<InvoiceResponse> getInvoiceResponsePaginatedResponse(Pageable pageable, Page<Invoice> data, List<InvoiceResponse> invoiceResponses) {
+    boolean hasNext = data.getNumber() < data.getTotalPages() - 1;
+    boolean hasPrevious = data.getNumber() > 0;
+
+    PaginatedResponse<InvoiceResponse> paginatedResponse = new PaginatedResponse<>();
+    paginatedResponse.setPage(pageable.getPageNumber());
+    paginatedResponse.setSize(pageable.getPageSize());
+    paginatedResponse.setTotalElements(data.getTotalElements());
+    paginatedResponse.setTotalPages(data.getTotalPages());
+    paginatedResponse.setContent(invoiceResponses);
+    paginatedResponse.setHasNext(hasNext);
+    paginatedResponse.setHasPrevious(hasPrevious);
+    return paginatedResponse;
   }
+
   private PointUsageSummary handlePoints(BigInteger amount, BigInteger points, Integer userId) {
     List<Point> pointsList = pointRepository
             .findUsablePointsByUserIdOrderByExpiry(userId, Instant.now());

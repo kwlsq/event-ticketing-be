@@ -91,6 +91,8 @@ public class Invoice {
   public void prePersist() {
     this.createdAt = Instant.now();
     this.modifiedAt = Instant.now();
+    this.paymentDate = Instant.now();
+    this.paymentMethod = "Credit Card";
   }
 
   @PreUpdate

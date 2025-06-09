@@ -1,4 +1,4 @@
-package com.purwafest.purwafest.event.infrastructure.repositories.specification;
+package com.purwafest.purwafest.event.infrastructure.specification;
 
 import com.purwafest.purwafest.event.domain.entities.Event;
 import jakarta.persistence.criteria.CriteriaBuilder;

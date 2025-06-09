@@ -46,4 +46,21 @@ public class EventDetailsResponse {
 
     return response;
   }
+
+  public static EventDetailsResponse toResponse(Event event) {
+    EventDetailsResponse response = new EventDetailsResponse();
+    response.id = event.getId();
+    response.name = event.getName();
+    response.description = event.getDescription();
+    response.date = event.getDate();
+    response.venue = event.getVenue();
+    response.location = event.getLocation();
+    response.images = new ArrayList<>(event.getImages());
+    response.reviews = new ArrayList<>(event.getReviews());
+
+    List<EventTicketType> eventTicketTypeList = new ArrayList<>(event.getTicketTypes());
+    response.eventTicketTypes = TicketTypeResponse.toResponse(eventTicketTypeList);
+
+    return response;
+  }
 }

@@ -9,6 +9,8 @@ import com.purwafest.purwafest.promotion.presentation.dtos.CreatePromotionReques
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Optional;
 
 @Service
@@ -31,8 +33,8 @@ public class PromotionServiceImpl implements PromotionService {
                 throw new IllegalArgumentException("Can't create referral promotion anymore");
             }
         } else {
-            event = eventRepository.findById(request.getEventId())
-                    .orElseThrow(() -> new IllegalArgumentException("Event not found with ID: " + request.getEventId()));
+            event = eventRepository.findById(request.getEventID())
+                    .orElseThrow(() -> new IllegalArgumentException("Event not found with ID: " + request.getEventID()));
         }
 
         Promotion promotion = Promotion.builder()
@@ -45,6 +47,7 @@ public class PromotionServiceImpl implements PromotionService {
                 .maxUsage(request.getMaxUsage())
                 .isReferralPromotion(request.getIsReferralPromotion())
                 .event(event)
+                .expiredDate(Instant.now().atZone(ZoneId.systemDefault()).plusMonths(request.getPeriod()).toInstant())
                 .build();
 
         return promotionRepository.save(promotion);

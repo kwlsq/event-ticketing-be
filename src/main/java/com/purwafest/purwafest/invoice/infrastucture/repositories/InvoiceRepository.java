@@ -3,6 +3,8 @@ package com.purwafest.purwafest.invoice.infrastucture.repositories;
 import com.purwafest.purwafest.dashboard.presentation.dtos.ChartData;
 import com.purwafest.purwafest.invoice.domain.entities.Invoice;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -15,7 +17,7 @@ import java.util.List;
 public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
 
   @Query("SELECT i FROM Invoice i WHERE i.user.id = :userId AND i.deletedAt IS NULL")
-  List<Invoice> findAllByUser_Id(Integer userId);
+  Page<Invoice> findAllByUser_Id(@Param("userId") Integer userId, Pageable pageable);
 
   @Query("SELECT SUM(i.amount) FROM Invoice i WHERE i.event.user.id = :userId")
   Long sumAmountByOrganizerId(@Param("organizerId") Integer userId);

@@ -10,7 +10,7 @@ import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventRepository;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventTicketTypeRepository;
-import com.purwafest.purwafest.event.infrastructure.repositories.specification.EventSpecification;
+import com.purwafest.purwafest.event.infrastructure.specification.EventSpecification;
 import com.purwafest.purwafest.event.presentation.dtos.EventDetailsResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventListResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventRequest;
