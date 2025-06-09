@@ -20,8 +20,6 @@ public class CreatePromotionRequest {
     private BigDecimal value;
     private Integer period;
     private Integer maxUsage;
-    private Integer usageCount;
     private Boolean isReferralPromotion;
-    private Integer eventId;
-
+    private Integer eventID;
 }

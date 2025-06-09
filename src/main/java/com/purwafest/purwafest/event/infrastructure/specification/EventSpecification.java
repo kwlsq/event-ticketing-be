@@ -1,4 +1,4 @@
-package com.purwafest.purwafest.event.infrastructure.repositories.specification;
+package com.purwafest.purwafest.event.infrastructure.specification;
 
 import com.purwafest.purwafest.event.domain.entities.Event;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -30,8 +30,14 @@ public class EventSpecification{
     };
   }
 
+  public static Specification<Event> isNotDeleted() {
+    return (Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+      return cb.isNull(root.get("deletedAt"));
+    };
+  }
+
   public static Specification<Event> getFilteredEvent(String searchText, String location) {
-    return Specification.where(searchByKeyword((searchText), (location)));
+    return Specification.where(isNotDeleted()).and(searchByKeyword((searchText), (location)));
   }
 
 }
