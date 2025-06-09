@@ -13,5 +13,8 @@ public class DiscountServiceImpl implements DiscountService {
         this.discountRepository=discountRepository;
     }
 
-
+    @Override
+    public Boolean isReferralDiscountEligible(Integer userID){
+        return discountRepository.existsByUserIdAndIsUsedFalseAndPromotionId(userID,17);
+    }
 }
