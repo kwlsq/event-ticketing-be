@@ -37,6 +37,7 @@ public class InvoiceResponse {
   private Instant paymentDate;
   private BigInteger amount;
   private BigInteger fees;
+  private BigInteger pointUsed;
   private BigInteger finalAmount;
   private EventDetailsResponse eventDetailsResponse;
   private List<InvoiceItemResponse> invoiceItems = new ArrayList<>();
@@ -52,6 +53,7 @@ public class InvoiceResponse {
     response.paymentDate = invoice.getPaymentDate();
     response.amount = invoice.getAmount();
     response.fees = invoice.getFees();
+    response.pointUsed = invoice.getValuePointUsage();
     response.finalAmount = invoice.getFinalAmount();
     response.eventDetailsResponse = EventDetailsResponse.toResponse(invoice.getEvent());
 

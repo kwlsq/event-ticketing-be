@@ -10,6 +10,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 public interface InvoiceService {
-  InvoiceResponse createInvoice(Integer eventID, List<InvoiceItemRequest> invoiceItemRequests, BigInteger points, Integer userID, Integer discountID);
+  InvoiceResponse createInvoice(Integer eventID, List<InvoiceItemRequest> invoiceItemRequests, BigInteger points, Integer userID, Integer promotionID);
   PaginatedResponse<InvoiceResponse> getAllInvoice(Pageable pageable);
 }

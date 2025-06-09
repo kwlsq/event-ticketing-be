@@ -17,7 +17,7 @@ public class CreatePromotionRequest {
     private String name;
     private String description;
     private PromotionType type;
-    private BigDecimal value;
+    private BigInteger value;
     private Integer period;
     private Integer maxUsage;
     private Boolean isReferralPromotion;

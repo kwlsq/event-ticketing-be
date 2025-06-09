@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.purwafest.purwafest.discount.domain.entities.Discount;
 import com.purwafest.purwafest.event.domain.entities.Event;
 import com.purwafest.purwafest.event.domain.enums.PromotionType;
+import com.purwafest.purwafest.invoice.domain.entities.Invoice;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Filter;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.util.Set;
 
@@ -45,7 +45,7 @@ public class Promotion {
 
   @NotNull
   @Column(name = "value", nullable = false)
-  private BigDecimal value;
+  private BigInteger value;
 
   @Column(name = "period")
   private Integer period;
@@ -67,6 +67,9 @@ public class Promotion {
   @JoinColumn(name = "event_id", referencedColumnName = "id")
   @JsonBackReference
   private Event event;
+
+  @OneToMany(mappedBy = "promotion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private Set<Invoice> invoice;
 
   @Column(name = "expired_date")
   private Instant expiredDate;

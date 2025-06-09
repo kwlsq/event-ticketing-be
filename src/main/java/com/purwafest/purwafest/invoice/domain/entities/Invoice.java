@@ -3,12 +3,10 @@ package com.purwafest.purwafest.invoice.domain.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.purwafest.purwafest.auth.domain.entities.User;
-import com.purwafest.purwafest.discount.domain.entities.Discount;
 import com.purwafest.purwafest.event.domain.entities.Event;
-import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.invoice.domain.enums.PaymentStatus;
+import com.purwafest.purwafest.promotion.domain.entities.Promotion;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.JdbcType;
@@ -83,9 +81,9 @@ public class Invoice {
   private Event event;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "voucher_id", referencedColumnName = "id")
+  @JoinColumn(name = "promotion_id", referencedColumnName = "id")
   @JsonBackReference
-  private Discount discount;
+  private Promotion promotion;
 
   @PrePersist
   public void prePersist() {

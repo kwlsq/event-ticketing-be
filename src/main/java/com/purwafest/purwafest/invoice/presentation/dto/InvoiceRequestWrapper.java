@@ -13,5 +13,5 @@ import java.util.List;
 public class InvoiceRequestWrapper {
   List<InvoiceItemRequest> invoiceItemRequests;
   private BigInteger pointAmount;
-  private Integer discountID;
+  private Integer promotionID;
 }
