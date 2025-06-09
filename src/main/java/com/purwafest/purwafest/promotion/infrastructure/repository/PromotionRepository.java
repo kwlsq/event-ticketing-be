@@ -19,6 +19,7 @@ public interface PromotionRepository extends JpaRepository<Promotion, Integer>, 
                 WHERE p.maxUsage > p.usageCount
                 AND p.event.id = :eventId
                 AND p.expiredDate >= CURRENT_TIMESTAMP
+                OR p.isReferralPromotion = true
             """)
     List<Promotion> findValidPromotions(@Param("eventId") Integer eventId);
 }

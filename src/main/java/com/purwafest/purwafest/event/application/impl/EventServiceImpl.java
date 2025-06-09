@@ -164,4 +164,9 @@ public class EventServiceImpl implements EventServices {
   public List<Event> getEvents() {
     return eventRepository.findAll();
   }
+
+  @Override
+  public List<Event> getAllOwnedEvents(Integer userID){
+    return eventRepository.findAllByUser_Id(userID);
+  }
 }

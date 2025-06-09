@@ -16,4 +16,5 @@ public interface EventServices {
   Event updateEvent(EventRequest newEvent);
   EventDetailsResponse getCurrentEvent(Integer eventID);
   List<Event> getEvents();
+  List<Event> getAllOwnedEvents(Integer userID);
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +17,7 @@ public class PromotionResponse {
     private String name;
     private String description;
     private PromotionType type;
-    private BigDecimal value;
+    private BigInteger value;
     private Boolean isReferralPromotion;
 
     public static PromotionResponse toResponse(Promotion promotion) {
