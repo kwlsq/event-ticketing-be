@@ -142,6 +142,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
       if (promotion.isReferralPromotion()) {
         Discount discount = discountRepository.findDiscountByPromotionIDAndUserID(promotionID, userID);
+        if(discount.isUsed()){
+          throw new IllegalArgumentException("Discount referral on this user is already used!");
+        }
         discount.setUsed(true);
       } else {
         UUID uid = UUID.randomUUID();
