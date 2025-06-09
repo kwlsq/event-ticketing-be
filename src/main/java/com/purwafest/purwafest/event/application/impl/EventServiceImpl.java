@@ -85,6 +85,47 @@ public class EventServiceImpl implements EventServices {
   }
 
   @Override
+  public PaginatedResponse<EventListResponse> getAllOwnedEvent(Integer userID, Pageable pageable) {
+
+    Page<Event> data = eventRepository.findAllByUser_Id(userID, pageable).map(event -> event);
+
+    List<EventListResponse> eventListResponses = new ArrayList<>();
+
+    List<Integer> eventIDs = new ArrayList<>();
+
+    data.getContent().forEach(event -> {
+      EventListResponse response = EventListResponse.toResponse(event);
+      eventListResponses.add(response);
+      eventIDs.add(event.getId());
+    });
+
+    Map<Integer, BigInteger> finalMinTicketPriceMap = eventTicketTypeRepository.getMinimumPriceMap(eventIDs);
+    Map<Integer, String> finalThumbnailImage = imageRepository.getThumbnailImage(eventIDs);
+
+    eventListResponses.forEach(eventListResponse -> {
+      eventListResponse.setStartingPrice(finalMinTicketPriceMap.get(eventListResponse.getId()));
+      eventListResponse.setThumbnailUrl(finalThumbnailImage.get(eventListResponse.getId()));
+    });
+
+    return getOwnedEventListResponsePaginatedResponse(pageable, data, eventListResponses);
+  }
+
+  private static PaginatedResponse<EventListResponse> getOwnedEventListResponsePaginatedResponse(Pageable pageable, Page<Event> data, List<EventListResponse> eventListResponses) {
+    boolean hasNext = data.getNumber() < data.getTotalPages() - 1;
+    boolean hasPrevious = data.getNumber() > 0;
+
+    PaginatedResponse<EventListResponse> paginatedResponse = new PaginatedResponse<>();
+    paginatedResponse.setPage(pageable.getPageNumber());
+    paginatedResponse.setSize(pageable.getPageSize());
+    paginatedResponse.setTotalElements(data.getTotalElements());
+    paginatedResponse.setTotalPages(data.getTotalPages());
+    paginatedResponse.setContent(eventListResponses);
+    paginatedResponse.setHasNext(hasNext);
+    paginatedResponse.setHasPrevious(hasPrevious);
+    return paginatedResponse;
+  }
+
+  @Override
   public Event createEvent(EventRequest request) {
     Integer userID = Claims.getUserId();
     Optional<User> user = userRepository.findById(userID);
@@ -165,8 +206,4 @@ public class EventServiceImpl implements EventServices {
     return eventRepository.findAll();
   }
 
-  @Override
-  public List<Event> getAllOwnedEvents(Integer userID){
-    return eventRepository.findAllByUser_Id(userID);
-  }
 }
