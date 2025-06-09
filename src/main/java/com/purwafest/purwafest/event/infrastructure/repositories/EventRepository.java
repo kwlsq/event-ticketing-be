@@ -2,6 +2,8 @@ package com.purwafest.purwafest.event.infrastructure.repositories;
 
 import com.purwafest.purwafest.event.domain.entities.Event;
 import com.purwafest.purwafest.event.domain.entities.Ticket;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -15,5 +17,5 @@ public interface EventRepository extends JpaRepository<Event, Integer>, JpaSpeci
     Integer countEventByUserId(Integer userId);
 
     @Query("SELECT e FROM Event e WHERE e.user.id = :userId AND e.deletedAt IS NULL")
-    List<Event> findAllByUser_Id(Integer userId);
+    Page<Event> findAllByUser_Id(Integer userId, Pageable pageable);
 }
