@@ -13,4 +13,6 @@ import java.util.List;
 public interface DiscountRepository extends JpaRepository<Discount, Integer>, JpaSpecificationExecutor<Discount> {
     @Query("SELECT d FROM Discount d WHERE d.promotion.id = :promotionID AND d.user.id = :userID")
     Discount findDiscountByPromotionIDAndUserID(Integer promotionID, Integer userID);
+
+    boolean existsByUserIdAndIsUsedFalseAndPromotionId(Integer userID, Integer promotionId);
 }
