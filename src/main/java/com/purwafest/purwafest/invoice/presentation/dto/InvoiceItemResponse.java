@@ -23,6 +23,18 @@ public class InvoiceItemResponse {
     InvoiceItemResponse invoiceItemResponse = new InvoiceItemResponse();
     invoiceItemResponse.qty = invoiceItems.getQty();
     invoiceItemResponse.subtotal = invoiceItems.getSubtotal();
+
+    EventTicketType ticketType = invoiceItems.getEventTicketType();
+
+    TicketTypeResponse ticketTypeResponse = new TicketTypeResponse();
+    ticketTypeResponse.setId(ticketType.getId());
+    ticketTypeResponse.setName(ticketType.getName());
+    ticketTypeResponse.setDate(ticketType.getSellDate());
+    ticketTypeResponse.setAvailableQty(ticketType.getAvailableQty());
+    ticketTypeResponse.setPrice(ticketType.getPrice());
+
+    invoiceItemResponse.ticketTypeResponse = ticketTypeResponse;
+
     return invoiceItemResponse;
   }
 }
