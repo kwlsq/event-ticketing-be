@@ -1,8 +1,7 @@
-package com.purwafest.purwafest.event.domain.entities;
+package com.purwafest.purwafest.category.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.purwafest.purwafest.event.domain.entities.Event;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
