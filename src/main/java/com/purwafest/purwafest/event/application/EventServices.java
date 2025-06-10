@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface EventServices {
-  PaginatedResponse<EventListResponse> getAllEvent(Pageable pageable, String search, String location);
+  PaginatedResponse<EventListResponse> getAllEvent(Pageable pageable, String search, String location, Integer category);
   PaginatedResponse<EventListResponse> getAllOwnedEvent(Integer userID, Pageable pageable);
   Event createEvent(EventRequest request);
   void deleteEvent(Integer eventID);

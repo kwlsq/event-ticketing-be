@@ -26,6 +26,7 @@ public class EventRequest {
 
   private List<EventTicketTypeRequest> ticketTypeRequest;
   private String ticketSaleDate;
+  private Integer categoryID;
 
   public Event toEvent() {
 

@@ -8,7 +8,7 @@ import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 
 public class EventSpecification{
-  public static Specification<Event> searchByKeyword(String keyword, String location) {
+  public static Specification<Event> searchByKeyword(String keyword, String location, Integer category) {
     return (Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
 
       Predicate keywordPredicate = cb.conjunction();
@@ -26,6 +26,11 @@ public class EventSpecification{
         return cb.and(keywordPredicate, locationPredicate);
       }
 
+      if (category != 0) {
+        Predicate categoryPredicate = cb.equal(root.get("category").get("id"), category);
+        return cb.and(keywordPredicate, categoryPredicate);
+      }
+
       return keywordPredicate;
     };
   }
@@ -36,8 +41,8 @@ public class EventSpecification{
     };
   }
 
-  public static Specification<Event> getFilteredEvent(String searchText, String location) {
-    return Specification.where(isNotDeleted()).and(searchByKeyword((searchText), (location)));
+  public static Specification<Event> getFilteredEvent(String searchText, String location, Integer category) {
+    return Specification.where(isNotDeleted()).and(searchByKeyword((searchText), (location), (category)));
   }
 
 }
