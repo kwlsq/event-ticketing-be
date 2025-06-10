@@ -14,12 +14,12 @@ import java.util.List;
 
 @Repository
 public interface PointRepository extends JpaRepository<Point,Integer>, JpaSpecificationExecutor<Point> {
-    @Query("SELECT COALESCE(SUM(p.amount), 0) " +
+    @Query("SELECT COALESCE(SUM(p.amount - p.amountUsed), 0) " +
             "FROM Point p " +
             "WHERE p.user.id = :id " +
             "AND p.expiredAt >= :now " +
-            "AND p.amount <> p.amountUsed")
-    Long getTotalPointsByUserIdNotExpired(@Param("id") Integer id, @Param("now") Instant now);
+            "AND p.isRedeemed = false")
+    Long getAvailablePointsByUserId(@Param("id") Integer id, @Param("now") Instant now);
 
     @Query("SELECT p FROM Point p " +
             "WHERE p.user.id = :userId " +

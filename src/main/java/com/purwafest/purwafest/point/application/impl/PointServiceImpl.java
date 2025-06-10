@@ -24,6 +24,6 @@ public class PointServiceImpl implements PointService {
         LocalDateTime startOfDay = today.atStartOfDay();
         Instant startOfDayInstant = startOfDay.toInstant(ZoneOffset.UTC);
 
-        return this.pointRepository.getTotalPointsByUserIdNotExpired(userId, startOfDayInstant);
+        return this.pointRepository.getAvailablePointsByUserId(userId, startOfDayInstant);
     }
 }
