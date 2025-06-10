@@ -19,6 +19,7 @@ public class PointRequest {
     private Boolean isRedeemed;
     private String pointResource;
     private Instant expiredAt;
+    private BigInteger amountUsed;
 
     public Point toPoint(User user){
         return Point.builder()
@@ -27,6 +28,7 @@ public class PointRequest {
                 .isRedeemed(isRedeemed)
                 .pointResource(pointResource)
                 .expiredAt(expiredAt)
+                .amountUsed(amountUsed)
                 .build();
     }
 }

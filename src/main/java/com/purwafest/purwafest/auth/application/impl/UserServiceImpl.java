@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
                 .plusMonths(3)
                 .atZone(ZoneId.systemDefault())
                 .toInstant();
-        Point point = new PointRequest(referrer.getId(), amount,false,PointConstants.POINT_SOURCE, expiredAt).toPoint(referrer);
+        Point point = new PointRequest(referrer.getId(), amount,false,PointConstants.POINT_SOURCE, expiredAt,BigInteger.ZERO).toPoint(referrer);
         pointRepository.save(point);
     }
 
