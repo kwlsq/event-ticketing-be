@@ -4,6 +4,8 @@ import com.purwafest.purwafest.event.domain.entities.Event;
 import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.image.domain.entities.Image;
 import com.purwafest.purwafest.event.domain.entities.Review;
+import com.purwafest.purwafest.promotion.domain.entities.Promotion;
+import com.purwafest.purwafest.promotion.presentation.dtos.PromotionResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +27,25 @@ public class EventDetailsResponse {
   private List<Image> images;
   private List<Review> reviews;
   private List<TicketTypeResponse> eventTicketTypes;
+  private List<PromotionResponse> promotions;
+
+  public static EventDetailsResponse toResponse(Event event, List<PromotionResponse> promotions) {
+    EventDetailsResponse response = new EventDetailsResponse();
+    response.id = event.getId();
+    response.name = event.getName();
+    response.description = event.getDescription();
+    response.date = event.getDate();
+    response.venue = event.getVenue();
+    response.location = event.getLocation();
+    response.images = new ArrayList<>(event.getImages());
+    response.reviews = new ArrayList<>(event.getReviews());
+    response.promotions = promotions;
+
+    List<EventTicketType> eventTicketTypeList = new ArrayList<>(event.getTicketTypes());
+    response.eventTicketTypes = TicketTypeResponse.toResponse(eventTicketTypeList);
+
+    return response;
+  }
 
   public static EventDetailsResponse toResponse(Event event) {
     EventDetailsResponse response = new EventDetailsResponse();

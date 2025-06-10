@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface EventServices {
   PaginatedResponse<EventListResponse> getAllEvent(Pageable pageable, String search, String location);
+  PaginatedResponse<EventListResponse> getAllOwnedEvent(Integer userID, Pageable pageable);
   Event createEvent(EventRequest request);
   void deleteEvent(Integer eventID);
   Event updateEvent(EventRequest newEvent);

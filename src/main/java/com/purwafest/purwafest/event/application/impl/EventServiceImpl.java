@@ -10,33 +10,37 @@ import com.purwafest.purwafest.event.domain.entities.EventTicketType;
 import com.purwafest.purwafest.event.domain.enums.EventStatus;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventRepository;
 import com.purwafest.purwafest.event.infrastructure.repositories.EventTicketTypeRepository;
-import com.purwafest.purwafest.event.infrastructure.repositories.specification.EventSpecification;
+import com.purwafest.purwafest.event.infrastructure.specification.EventSpecification;
 import com.purwafest.purwafest.event.presentation.dtos.EventDetailsResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventListResponse;
 import com.purwafest.purwafest.event.presentation.dtos.EventRequest;
+import com.purwafest.purwafest.image.infrastucture.repositories.ImageRepository;
+import com.purwafest.purwafest.promotion.domain.entities.Promotion;
+import com.purwafest.purwafest.promotion.infrastructure.repository.PromotionRepository;
+import com.purwafest.purwafest.promotion.presentation.dtos.PromotionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class EventServiceImpl implements EventServices {
   private final EventRepository eventRepository;
   private final UserRepository userRepository;
   private final EventTicketTypeRepository eventTicketTypeRepository;
+  private final PromotionRepository promotionRepository;
+  private final ImageRepository imageRepository;
 
-  public EventServiceImpl (EventRepository eventRepository, UserRepository userRepository, EventTicketTypeRepository eventTicketTypeRepository) {
+  public EventServiceImpl (EventRepository eventRepository, UserRepository userRepository, EventTicketTypeRepository eventTicketTypeRepository, PromotionRepository promotionRepository, ImageRepository imageRepository) {
     this.eventRepository = eventRepository;
     this.userRepository = userRepository;
     this.eventTicketTypeRepository = eventTicketTypeRepository;
+    this.promotionRepository = promotionRepository;
+    this.imageRepository = imageRepository;
   }
 
   @Override
@@ -46,15 +50,67 @@ public class EventServiceImpl implements EventServices {
 
     List<EventListResponse> eventListResponses = new ArrayList<>();
 
+    List<Integer> eventIDs = new ArrayList<>();
+
     data.getContent().forEach(event -> {
       EventListResponse response = EventListResponse.toResponse(event);
       eventListResponses.add(response);
+      eventIDs.add(event.getId());
+    });
+
+    Map<Integer, BigInteger> finalMinTicketPriceMap = eventTicketTypeRepository.getMinimumPriceMap(eventIDs);
+    Map<Integer, String> finalThumbnailImage = imageRepository.getThumbnailImage(eventIDs);
+
+    eventListResponses.forEach(eventListResponse -> {
+      eventListResponse.setStartingPrice(finalMinTicketPriceMap.get(eventListResponse.getId()));
+      eventListResponse.setThumbnailUrl(finalThumbnailImage.get(eventListResponse.getId()));
     });
 
     return getEventListResponsePaginatedResponse(pageable, data, eventListResponses);
   }
 
   private static PaginatedResponse<EventListResponse> getEventListResponsePaginatedResponse(Pageable pageable, Page<Event> data, List<EventListResponse> eventListResponses) {
+    boolean hasNext = data.getNumber() < data.getTotalPages() - 1;
+    boolean hasPrevious = data.getNumber() > 0;
+
+    PaginatedResponse<EventListResponse> paginatedResponse = new PaginatedResponse<>();
+    paginatedResponse.setPage(pageable.getPageNumber());
+    paginatedResponse.setSize(pageable.getPageSize());
+    paginatedResponse.setTotalElements(data.getTotalElements());
+    paginatedResponse.setTotalPages(data.getTotalPages());
+    paginatedResponse.setContent(eventListResponses);
+    paginatedResponse.setHasNext(hasNext);
+    paginatedResponse.setHasPrevious(hasPrevious);
+    return paginatedResponse;
+  }
+
+  @Override
+  public PaginatedResponse<EventListResponse> getAllOwnedEvent(Integer userID, Pageable pageable) {
+
+    Page<Event> data = eventRepository.findAllByUser_Id(userID, pageable).map(event -> event);
+
+    List<EventListResponse> eventListResponses = new ArrayList<>();
+
+    List<Integer> eventIDs = new ArrayList<>();
+
+    data.getContent().forEach(event -> {
+      EventListResponse response = EventListResponse.toResponse(event);
+      eventListResponses.add(response);
+      eventIDs.add(event.getId());
+    });
+
+    Map<Integer, BigInteger> finalMinTicketPriceMap = eventTicketTypeRepository.getMinimumPriceMap(eventIDs);
+    Map<Integer, String> finalThumbnailImage = imageRepository.getThumbnailImage(eventIDs);
+
+    eventListResponses.forEach(eventListResponse -> {
+      eventListResponse.setStartingPrice(finalMinTicketPriceMap.get(eventListResponse.getId()));
+      eventListResponse.setThumbnailUrl(finalThumbnailImage.get(eventListResponse.getId()));
+    });
+
+    return getOwnedEventListResponsePaginatedResponse(pageable, data, eventListResponses);
+  }
+
+  private static PaginatedResponse<EventListResponse> getOwnedEventListResponsePaginatedResponse(Pageable pageable, Page<Event> data, List<EventListResponse> eventListResponses) {
     boolean hasNext = data.getNumber() < data.getTotalPages() - 1;
     boolean hasPrevious = data.getNumber() > 0;
 
@@ -132,11 +188,22 @@ public class EventServiceImpl implements EventServices {
   @Override
   public EventDetailsResponse getCurrentEvent(Integer eventID) {
     Event event = eventRepository.findById(eventID).orElseThrow(() -> new RuntimeException("Event not found!"));
-    return EventDetailsResponse.toResponse(event);
+    return EventDetailsResponse.toResponse(event,getPromotions(eventID));
+  }
+
+  private List<PromotionResponse> getPromotions(Integer eventId){
+    List<Promotion> promotions = promotionRepository.findValidPromotions(eventId);
+    List<PromotionResponse> promotionResponses = new ArrayList<>();
+    promotions.forEach(promotion -> {
+      PromotionResponse response = PromotionResponse.toResponse(promotion);
+      promotionResponses.add(response);
+    });
+    return promotionResponses;
   }
 
   @Override
   public List<Event> getEvents() {
     return eventRepository.findAll();
   }
+
 }

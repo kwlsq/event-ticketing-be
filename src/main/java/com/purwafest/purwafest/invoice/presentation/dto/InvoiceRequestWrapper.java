@@ -10,8 +10,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class InvoiceItemRequestWrapper {
+public class InvoiceRequestWrapper {
   List<InvoiceItemRequest> invoiceItemRequests;
   private BigInteger pointAmount;
-  private Integer discountId;
+  private Integer promotionID;
 }

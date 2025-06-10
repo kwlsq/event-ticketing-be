@@ -25,7 +25,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
     @Override
     public DashboardResponse getDashboardData(String filter, Integer userId){
-        Long totalSales = invoiceRepository.sumFinalAmountByUserId(userId);
+        Long totalSales = invoiceRepository.sumAmountByOrganizerId(userId);
 
         Integer totalAttendees = invoiceItemsRepository.countByUserId(userId);
 

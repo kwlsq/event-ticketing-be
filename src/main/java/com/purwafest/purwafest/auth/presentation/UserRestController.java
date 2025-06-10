@@ -22,7 +22,7 @@ public class UserRestController {
         Integer id = Claims.getUserId();
         return Response.successfulResponse(
                 "Get profile Success",
-                userService.profile(id)
+                userService.getUserProfileResponse(id)
         );
     }
 
