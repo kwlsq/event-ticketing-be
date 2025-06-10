@@ -2,6 +2,8 @@ package com.purwafest.purwafest.event.application.impl;
 
 import com.purwafest.purwafest.auth.domain.entities.User;
 import com.purwafest.purwafest.auth.infrastructure.repository.UserRepository;
+import com.purwafest.purwafest.category.domain.entities.Category;
+import com.purwafest.purwafest.category.infrastructure.repository.CategoryRepository;
 import com.purwafest.purwafest.common.PaginatedResponse;
 import com.purwafest.purwafest.common.security.Claims;
 import com.purwafest.purwafest.event.application.EventServices;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.*;
@@ -34,19 +37,21 @@ public class EventServiceImpl implements EventServices {
   private final EventTicketTypeRepository eventTicketTypeRepository;
   private final PromotionRepository promotionRepository;
   private final ImageRepository imageRepository;
+  private final CategoryRepository categoryRepository;
 
-  public EventServiceImpl (EventRepository eventRepository, UserRepository userRepository, EventTicketTypeRepository eventTicketTypeRepository, PromotionRepository promotionRepository, ImageRepository imageRepository) {
+  public EventServiceImpl (EventRepository eventRepository, UserRepository userRepository, EventTicketTypeRepository eventTicketTypeRepository, PromotionRepository promotionRepository, ImageRepository imageRepository, CategoryRepository categoryRepository) {
     this.eventRepository = eventRepository;
     this.userRepository = userRepository;
     this.eventTicketTypeRepository = eventTicketTypeRepository;
     this.promotionRepository = promotionRepository;
     this.imageRepository = imageRepository;
+    this.categoryRepository = categoryRepository;
   }
 
   @Override
-  public PaginatedResponse<EventListResponse> getAllEvent(Pageable pageable, String search, String location) {
+  public PaginatedResponse<EventListResponse> getAllEvent(Pageable pageable, String search, String location, Integer category) {
 
-    Page<Event> data = eventRepository.findAll(EventSpecification.getFilteredEvent(search, location), pageable).map(event -> event);
+    Page<Event> data = eventRepository.findAll(EventSpecification.getFilteredEvent(search, location, category), pageable).map(event -> event);
 
     List<EventListResponse> eventListResponses = new ArrayList<>();
 
@@ -129,12 +134,14 @@ public class EventServiceImpl implements EventServices {
   public Event createEvent(EventRequest request) {
     Integer userID = Claims.getUserId();
     Optional<User> user = userRepository.findById(userID);
+    Optional<Category> categoryOptional = categoryRepository.findById(request.getCategoryID());
 
-    if (user.isPresent()) {
+    if (user.isPresent() && categoryOptional.isPresent()) {
 //      Create event first to get eventID
       Event event = request.toEvent();
       event.setUser(user.get());
       event.setStatus(EventStatus.UPCOMING);
+      event.setCategory(categoryOptional.get());
       eventRepository.save(event);
 
 //      Parse sell date to Instant data type
